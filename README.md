@@ -1,28 +1,28 @@
-# GardenVariety
-Short description and motivation.
+# garden_variety
 
-## Usage
-How to use my plugin.
+Delightfully boring Rails controllers.
+
 
 ## Installation
+
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'garden_variety'
+gem "garden_variety"
 ```
 
 And then execute:
+
 ```bash
 $ bundle
 ```
 
-Or install it yourself as:
-```bash
-$ gem install garden_variety
-```
 
 ## Contributing
-Contribution directions go here.
+
+Run `rake test` to run the tests.
+
 
 ## License
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
+[MIT License](https://opensource.org/licenses/MIT)
