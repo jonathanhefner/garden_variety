@@ -1,0 +1,3 @@
+module GardenVariety
+  # Your code goes here...
+end
