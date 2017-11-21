@@ -1,3 +1,1 @@
-module GardenVariety
-  # Your code goes here...
-end
+require "garden_variety/version"
