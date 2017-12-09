@@ -2,6 +2,10 @@ require "test_helper"
 require "garden_variety"
 
 
+Post.class_eval do
+  validates :title, exclusion: { in: ["BAD!"] }
+end
+
 PostPolicy.class_eval do
   class_attribute :allow_all
 
@@ -113,6 +117,13 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "NEW!", new_post.title
   end
 
+  def test_create_validation_fails
+    post posts_path, params: { post: { title: "BAD!" } }
+    assert_response :success
+    assert_select "form[action=?]", posts_path
+    refute Post.where(title: "BAD!").exists?
+  end
+
   def test_create_forbidden
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
@@ -138,9 +149,15 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "test", response.headers["X-Test-find_resource"]
     follow_redirect!
     assert_response :success
-    updated_post = Post.find(AN_ID)
-    assert_equal post_path(updated_post), path
-    assert_equal "UPDATED!", updated_post.title
+    assert_equal post_path(AN_ID), path
+    assert_equal "UPDATED!", Post.find(AN_ID).title
+  end
+
+  def test_update_validation_fails
+    put post_path(AN_ID), params: { post: { title: "BAD!" } }
+    assert_response :success
+    assert_select "form[action=?]", post_path(AN_ID)
+    refute_equal "BAD!", Post.find(AN_ID).title
   end
 
   def test_update_forbidden
@@ -169,10 +186,10 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   def test_strong_params
     PostPolicy.permitted_attributes = []
-    put post_path(AN_ID), params: { post: { title: "BAD!" } }
+    put post_path(AN_ID), params: { post: { title: "UNPERMITTED!" } }
     follow_redirect!
     assert_response :success
-    refute_equal "BAD!", Post.find(AN_ID).title
+    refute_equal "UNPERMITTED!", Post.find(AN_ID).title
   end
 
 end
