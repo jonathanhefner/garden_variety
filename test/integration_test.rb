@@ -30,6 +30,16 @@ end
 PostsController.class_eval do
   protect_from_forgery with: :null_session
 
+  [:create, :update, :destroy].each do |action|
+    define_method(action) do
+      if request.headers["X-Test-redirect_to"]
+        super(){ redirect_to request.headers["X-Test-redirect_to"] }
+      else
+        super()
+      end
+    end
+  end
+
   def list_resources
     response.headers["X-Test-list_resources"] = "test"
     super
@@ -44,7 +54,6 @@ PostsController.class_eval do
     response.headers["X-Test-new_resource"] = "test"
     super
   end
-
 end
 
 
@@ -110,11 +119,17 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_create
     post posts_path, params: { post: { title: "NEW!" } }
     assert_equal "test", response.headers["X-Test-new_resource"]
-    follow_redirect!
-    assert_response :success
     new_post = Post.order(:created_at).last
-    assert_equal post_path(new_post), path
+    assert_redirected_to new_post
     assert_equal "NEW!", new_post.title
+  end
+
+  def test_create_with_callback
+    expected_path = "/?test"
+    post posts_path, params: { post: { title: "NEW!" } },
+      headers: { "X-Test-redirect_to" => expected_path }
+    assert_redirected_to expected_path
+    assert_equal "NEW!", Post.order(:created_at).last.title
   end
 
   def test_create_validation_fails
@@ -147,9 +162,15 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_update
     put post_path(AN_ID), params: { post: { title: "UPDATED!" } }
     assert_equal "test", response.headers["X-Test-find_resource"]
-    follow_redirect!
-    assert_response :success
-    assert_equal post_path(AN_ID), path
+    assert_redirected_to post_path(AN_ID)
+    assert_equal "UPDATED!", Post.find(AN_ID).title
+  end
+
+  def test_update_with_callback
+    expected_path = "/?test"
+    put post_path(AN_ID), params: { post: { title: "UPDATED!" } },
+      headers: { "X-Test-redirect_to" => expected_path }
+    assert_redirected_to expected_path
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
@@ -171,8 +192,14 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_destroy
     delete post_path(AN_ID)
     assert_equal "test", response.headers["X-Test-find_resource"]
-    follow_redirect!
-    assert_equal posts_path, path
+    assert_redirected_to posts_path
+    refute Post.exists?(AN_ID)
+  end
+
+  def test_destroy_with_callback
+    expected_path = "/?test"
+    delete post_path(AN_ID), headers: { "X-Test-redirect_to" => expected_path }
+    assert_redirected_to expected_path
     refute Post.exists?(AN_ID)
   end
 

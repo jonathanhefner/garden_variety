@@ -21,7 +21,7 @@ class PostsController < ApplicationController
 end
 ```
 
-...expands to the following conventional implementation:
+...is equivalent to the following conventional implementation:
 
 ```ruby
 class PostsController < ApplicationController
@@ -67,7 +67,7 @@ class PostsController < ApplicationController
   def destroy
     self.resource = find_resource
     authorize(resource)
-    resource.destroy
+    resource.destroy!
     redirect_to action: :index
   end
 
@@ -304,6 +304,27 @@ to `root_path` rather than the resource itself, as would be
 conventional.  The *garden_variety* helper methods all work as expected
 because `RegistrationForm` responds to `assign_attributes` and `save`,
 and has a default (nullary) constructor.
+
+This pattern of overriding an action merely to respond differently upon
+success is common enough that *garden_variety* provides a concise syntax
+for it:
+
+```ruby
+class RegistrationFormsController < ApplicationController
+  garden_variety :new, :create
+
+  def create
+    super{ redirect_to root_path }
+  end
+end
+```
+
+Note here the `garden_variety` macro generates a default `create`
+action, which is then invoked with `super` in the `create` override.
+When a block is given to the default `create` action, the block is
+treated as an on-success callback which replaces the default redirect.
+This callback behavior is also available for the `update` and `destroy`
+actions.
 
 
 ### Non-REST actions

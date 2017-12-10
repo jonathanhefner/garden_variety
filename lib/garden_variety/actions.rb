@@ -29,11 +29,14 @@ module GardenVariety
 
   module CreateAction
     # Garden variety controller +create+ action.
+    # @overload create()
+    # @overload create()
+    #   @yield on-success callback, replaces default redirect
     # @return [void]
     def create
       self.resource = vest(new_resource)
       if resource.save
-        redirect_to resource
+        block_given? ? yield : redirect_to(resource)
       else
         render :new
       end
@@ -51,11 +54,14 @@ module GardenVariety
 
   module UpdateAction
     # Garden variety controller +update+ action.
+    # @overload update()
+    # @overload update()
+    #   @yield on-success callback, replaces default redirect
     # @return [void]
     def update
       self.resource = vest(find_resource)
       if resource.save
-        redirect_to resource
+        block_given? ? yield : redirect_to(resource)
       else
         render :edit
       end
@@ -64,12 +70,15 @@ module GardenVariety
 
   module DestroyAction
     # Garden variety controller +destroy+ action.
+    # @overload destroy()
+    # @overload destroy()
+    #   @yield on-success callback, replaces default redirect
     # @return [void]
     def destroy
       self.resource = find_resource
       authorize(resource)
-      resource.destroy
-      redirect_to action: :index
+      resource.destroy!
+      block_given? ? yield : redirect_to(action: :index)
     end
   end
 
