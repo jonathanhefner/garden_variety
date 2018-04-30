@@ -1,3 +1,8 @@
+## 1.1.1
+
+* Loosen Rails version constraint
+
+
 ## 1.1.0
 
 * Added concise syntax for overriding the on-success redirect of the
