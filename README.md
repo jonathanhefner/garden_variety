@@ -221,17 +221,16 @@ end
 ### Integrating with authentication
 
 The details of integrating authentication will depend on your chosen
-authentication library.  [Devise](https://rubygems.org/gems/devise) is a
-popular gem, but I prefer [Clearance](https://rubygems.org/gems/clearance)
-for its simplicity and concision.  Whatever library you choose, it is
-likely to include a "before filter" which you must invoke in your
-controller to enforce authentication.  Something similar to the
-following:
+authentication library.  [Devise](https://rubygems.org/gems/devise) is
+the most popular, but [Clearance](https://rubygems.org/gems/clearance)
+is also a strong choice.  Whatever library you choose, it is likely to
+include a "before filter" which you must invoke in your controller to
+enforce authentication.  Something similar to the following:
 
 ```ruby
 class PostsController < ApplicationController
   garden_variety
-  before_action :require_login
+  before_action :authenticate_user!
 end
 ```
 
@@ -248,11 +247,10 @@ defined to always return nil.
 
 **Note about Clearance:** Clearance versions previous to 2.0 define a
 deprecated `authorize` method which conflicts with Pundit.  To avoid
-this conflict, add the following line to your ApplicationController or
-Clearance initializer:
+this conflict, add the following line to your Clearance initializer:
 
 ```ruby
-::Clearance::Controller.send(:remove_method, :authorize)
+::Clearance::Authorization.send(:remove_method, :authorize)
 ```
 
 
@@ -305,9 +303,9 @@ conventional.  The *garden_variety* helper methods all work as expected
 because `RegistrationForm` responds to `assign_attributes` and `save`,
 and has a default (nullary) constructor.
 
-This pattern of overriding an action merely to respond differently upon
-success is common enough that *garden_variety* provides a concise syntax
-for it:
+This pattern of overriding a controller action merely to respond
+differently upon success is common enough that *garden_variety* provides
+a concise syntax for it:
 
 ```ruby
 class RegistrationFormsController < ApplicationController
@@ -319,9 +317,9 @@ class RegistrationFormsController < ApplicationController
 end
 ```
 
-Note here the `garden_variety` macro generates a default `create`
-action, which is then invoked with `super` in the `create` override.
-When a block is given to the default `create` action, the block is
+In the above example, the `garden_variety` macro generates a
+conventional `create` action, which is then invoked via `super` in the
+`create` override.  Here, when a block is passed to `super`, it is
 treated as an on-success callback which replaces the default redirect.
 This callback behavior is also available for the `update` and `destroy`
 actions.
@@ -368,7 +366,8 @@ instance variable will be used instead of `@published_posts`.
 
 This example may be somewhat contrived, but there is an excellent talk
 from RailsConf which delves deeper into the principle:
-[In Relentless Pursuit of REST](https://www.youtube.com/watch?v=HctYHe-YjnE).
+[In Relentless Pursuit of REST](https://www.youtube.com/watch?v=HctYHe-YjnE)
+([slides](https://speakerdeck.com/derekprior/in-relentless-pursuit-of-rest)).
 
 
 ## Installation
@@ -382,7 +381,7 @@ gem "garden_variety"
 Then execute:
 
 ```bash
-$ bundle
+$ bundle install
 ```
 
 And finally, if you haven't already used and installed Pundit, run the
