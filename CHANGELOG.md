@@ -1,6 +1,10 @@
+## 1.1.2
+
+* Actually loosen Rails version constraint
+
 ## 1.1.1
 
-* Loosen Rails version constraint
+* ~~Loosen Rails version constraint~~
 
 
 ## 1.1.0
