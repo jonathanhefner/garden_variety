@@ -111,6 +111,13 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", posts_path
   end
 
+  def test_new_with_params
+    get new_post_path, params: { post: { title: "POPULATED!" } }
+    assert_response :success
+    assert_select 'input[name="post[title]"][value=?]', "POPULATED!"
+    refute Post.where(title: "POPULATED!").exists?
+  end
+
   def test_new_forbidden
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) { get new_post_path }

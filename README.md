@@ -37,8 +37,12 @@ class PostsController < ApplicationController
   end
 
   def new
-    self.resource = new_resource
-    authorize(resource)
+    if params.key?(resource_class.model_name.param_key)
+      self.resource = vest(new_resource)
+    else
+      self.resource = new_resource
+      authorize(resource)
+    end
   end
 
   def create
