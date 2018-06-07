@@ -98,7 +98,9 @@ module GardenVariety
       # @param actions [Array<:index, :show, :new, :create, :edit, :update, :destroy>]
       # @param resources [Symbol, String]
       # @return [void]
-      def garden_variety(*actions, resources: controller_name)
+      def garden_variety(*actions, resources: controller_path)
+        resources_attr = resources.to_s.underscore.tr("/", "_")
+
         class_eval <<-CODE
           private
 
@@ -107,19 +109,19 @@ module GardenVariety
           end
 
           def resources
-            @#{resources.to_s.underscore}
+            @#{resources_attr}
           end
 
           def resources=(models)
-            @#{resources.to_s.underscore} = models
+            @#{resources_attr} = models
           end
 
           def resource
-            @#{resources.to_s.underscore.singularize}
+            @#{resources_attr.singularize}
           end
 
           def resource=(model)
-            @#{resources.to_s.underscore.singularize} = model
+            @#{resources_attr.singularize} = model
           end
         CODE
 
@@ -143,7 +145,7 @@ module GardenVariety
     #
     # @return [Class]
     def resource_class
-      @resource_class ||= controller_name.classify.constantize
+      @resource_class ||= controller_path.classify.constantize
     end
 
     # @!visibility public

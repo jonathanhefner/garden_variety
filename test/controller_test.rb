@@ -15,6 +15,20 @@ class NoUsagesController < ActionController::Base
   include GardenVariety::Controller
 end
 
+module Namespaced
+  class DefaultUsage; end
+  class NoUsage; end
+end
+
+class Namespaced::DefaultUsagesController < ActionController::Base
+  include GardenVariety::Controller
+  garden_variety
+end
+
+class Namespaced::NoUsagesController < ActionController::Base
+  include GardenVariety::Controller
+end
+
 class CustomYuuseju; end
 
 class CustomUsagesController < ActionController::Base
@@ -38,6 +52,14 @@ class ControllerTest < Minitest::Test
 
   def test_resource_class_optimized_override
     assert_equal DefaultUsage, DefaultUsagesController.new.send(:resource_class)
+  end
+
+  def test_resource_class_base_behavior_with_namespace
+    assert_equal Namespaced::NoUsage, Namespaced::NoUsagesController.new.send(:resource_class)
+  end
+
+  def test_resource_class_optimized_override_with_namespace
+    assert_equal Namespaced::DefaultUsage, Namespaced::DefaultUsagesController.new.send(:resource_class)
   end
 
   def test_resource_class_with_custom_resource
@@ -66,6 +88,30 @@ class ControllerTest < Minitest::Test
     controller = DefaultUsagesController.new
     assert_equal :expected, controller.send(:resource=, :expected)
     assert_equal :expected, controller.instance_eval{ @default_usage }
+  end
+
+  def test_resources_getter_with_namespace
+    controller = Namespaced::DefaultUsagesController.new
+    controller.instance_eval{ @namespaced_default_usages = :expected }
+    assert_equal :expected, controller.send(:resources)
+  end
+
+  def test_resources_setter_with_namespace
+    controller = Namespaced::DefaultUsagesController.new
+    assert_equal :expected, controller.send(:resources=, :expected)
+    assert_equal :expected, controller.instance_eval{ @namespaced_default_usages }
+  end
+
+  def test_resource_getter_with_namespace
+    controller = Namespaced::DefaultUsagesController.new
+    controller.instance_eval{ @namespaced_default_usage = :expected }
+    assert_equal :expected, controller.send(:resource)
+  end
+
+  def test_resource_setter_with_namespace
+    controller = Namespaced::DefaultUsagesController.new
+    assert_equal :expected, controller.send(:resource=, :expected)
+    assert_equal :expected, controller.instance_eval{ @namespaced_default_usage }
   end
 
   def test_resources_getter_with_custom_resource
