@@ -71,8 +71,11 @@ class PostsController < ApplicationController
   def destroy
     self.resource = find_resource
     authorize(resource)
-    resource.destroy!
-    redirect_to action: :index
+    if resource.destroy
+      redirect_to action: :index
+    else
+      redirect_back(fallback_location: { action: :show })
+    end
   end
 
   private

@@ -4,6 +4,7 @@ require "garden_variety"
 
 Post.class_eval do
   validates :title, exclusion: { in: ["BAD!"] }
+  before_destroy{|post| throw(:abort) if post.title == "PERMANENT!" }
 end
 
 PostPolicy.class_eval do
@@ -208,6 +209,20 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     delete post_path(AN_ID), headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
     refute Post.exists?(AN_ID)
+  end
+
+  def test_destroy_fails
+    Post.find(AN_ID).update(title: "PERMANENT!")
+    delete post_path(AN_ID)
+    assert_redirected_to post_path(AN_ID)
+    assert Post.exists?(AN_ID)
+  end
+
+  def test_destroy_fails_redirect_back
+    Post.find(AN_ID).update(title: "PERMANENT!")
+    delete post_path(AN_ID), headers: { "HTTP_REFERER" => posts_path }
+    assert_redirected_to posts_path
+    assert Post.exists?(AN_ID)
   end
 
   def test_destroy_forbidden
