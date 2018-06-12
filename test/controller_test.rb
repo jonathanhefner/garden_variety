@@ -60,7 +60,8 @@ class ControllerTest < Minitest::Test
   ).freeze
 
   def test_assumptions
-    assert_match %r"^namespaced_", Namespaced::DefaultUsage.model_name.singular
+    assert_equal "namespaced_default_usage", Namespaced::DefaultUsage.model_name.singular
+    assert_equal "Default usage", Namespaced::DefaultUsage.model_name.human
   end
 
   def test_resource_class
@@ -116,6 +117,76 @@ class ControllerTest < Minitest::Test
   def test_include_custom_actions
     action_modules = [GardenVariety::IndexAction, GardenVariety::ShowAction]
     assert_empty (action_modules - CustomUsagesController.included_modules)
+  end
+
+  def test_flash_options
+    CONTROLLER_MODELS.each do |controller_class, model_class|
+      resource_name = model_class.model_name.human.downcase
+      actual = controller_class.new.send(:flash_options)
+      assert_equal resource_name, actual[:resource_name]
+      assert_equal resource_name.capitalize, actual[:resource_capitalized]
+    end
+  end
+
+  def test_flash_message_key_priority
+    controller = DefaultUsagesController.new
+    controller.action_name = "test"
+    status = "priority"
+
+    flash_options = { extra: "info" }
+    controller.send(:define_singleton_method, :flash_options, ->{ flash_options })
+
+    scopes = [controller.controller_name, controller.action_name, status]
+    prioritized_keys = scopes.length.downto(1).map{|n| scopes.last(n).join(".") }.
+      flat_map{|key| [key, "#{key}_html"] }
+
+    translations = prioritized_keys.reduce({}){|h, key| h.merge(key => "#{key} %{extra}") }
+    translations.each{|key, value| store_translation(key, value) }
+
+    prioritized_keys.each do |key|
+      assert_equal(translations[key] % flash_options, controller.send(:flash_message, status))
+      store_translation(key, nil)
+    end
+  end
+
+  def test_flash_message_with_custom_resource
+    controller = CustomUsagesController.new
+    controller.action_name = "test"
+    status = "custom"
+    # flash message is a controller concern, so key should be based on
+    # controller name, NOT model name
+    key = "#{controller.controller_name}.#{controller.action_name}.#{status}"
+    store_translation(key, "expected")
+    assert_equal "expected", controller.send(:flash_message, status)
+  end
+
+  def test_flash_message_with_namespace
+    controller = Namespaced::DefaultUsagesController.new
+    controller.action_name = "test"
+    status = "namespaced"
+    # full key should include namespace
+    key = "#{controller.controller_path.tr("/", ".")}.#{controller.action_name}.#{status}"
+    store_translation(key, "expected")
+    assert_equal "expected", controller.send(:flash_message, status)
+  end
+
+  def test_flash_message_html_escaping
+    controller = DefaultUsagesController.new
+    controller.action_name = "test"
+    text = "<p>hello</p>"
+
+    store_translation("literal_text", text)
+    refute controller.send(:flash_message, "literal_text").html_safe?
+
+    store_translation("raw_html", text)
+    assert controller.send(:flash_message, "raw_html").html_safe?
+  end
+
+  private
+
+  def store_translation(key, value)
+    normalized = key.split(".").reverse.reduce(value){|acc, scope| { scope.to_sym => acc } }
+    I18n.backend.store_translations(:en, normalized)
   end
 
 end

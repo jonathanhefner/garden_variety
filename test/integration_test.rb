@@ -55,6 +55,10 @@ PostsController.class_eval do
     response.headers["X-Test-new_resource"] = "test"
     super
   end
+
+  def flash_message(status)
+    "test flash_message"
+  end
 end
 
 
@@ -129,6 +133,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "test", response.headers["X-Test-new_resource"]
     new_post = Post.order(:created_at).last
     assert_redirected_to new_post
+    assert_flash :success, "test flash_message"
     assert_equal "NEW!", new_post.title
   end
 
@@ -137,12 +142,14 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     post posts_path, params: { post: { title: "NEW!" } },
       headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
+    assert_flash :success, "test flash_message"
     assert_equal "NEW!", Post.order(:created_at).last.title
   end
 
   def test_create_validation_fails
     post posts_path, params: { post: { title: "BAD!" } }
     assert_response :success
+    assert_flash :error, "test flash_message", now: true
     assert_select "form[action=?]", posts_path
     refute Post.where(title: "BAD!").exists?
   end
@@ -171,6 +178,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     put post_path(AN_ID), params: { post: { title: "UPDATED!" } }
     assert_equal "test", response.headers["X-Test-find_resource"]
     assert_redirected_to post_path(AN_ID)
+    assert_flash :success, "test flash_message"
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
@@ -179,6 +187,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     put post_path(AN_ID), params: { post: { title: "UPDATED!" } },
       headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
+    assert_flash :success, "test flash_message"
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
@@ -186,6 +195,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     put post_path(AN_ID), params: { post: { title: "BAD!" } }
     assert_response :success
     assert_select "form[action=?]", post_path(AN_ID)
+    assert_flash :error, "test flash_message", now: true
     refute_equal "BAD!", Post.find(AN_ID).title
   end
 
@@ -201,6 +211,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     delete post_path(AN_ID)
     assert_equal "test", response.headers["X-Test-find_resource"]
     assert_redirected_to posts_path
+    assert_flash :success, "test flash_message"
     refute Post.exists?(AN_ID)
   end
 
@@ -208,6 +219,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     expected_path = "/?test"
     delete post_path(AN_ID), headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
+    assert_flash :success, "test flash_message"
     refute Post.exists?(AN_ID)
   end
 
@@ -215,6 +227,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     Post.find(AN_ID).update(title: "PERMANENT!")
     delete post_path(AN_ID)
     assert_redirected_to post_path(AN_ID)
+    assert_flash :error, "test flash_message"
     assert Post.exists?(AN_ID)
   end
 
@@ -222,6 +235,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     Post.find(AN_ID).update(title: "PERMANENT!")
     delete post_path(AN_ID), headers: { "HTTP_REFERER" => posts_path }
     assert_redirected_to posts_path
+    assert_flash :error, "test flash_message"
     assert Post.exists?(AN_ID)
   end
 
@@ -239,6 +253,20 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     refute_equal "UNPERMITTED!", Post.find(AN_ID).title
+  end
+
+  private
+
+  def assert_flash(key, matcher, now: false)
+    assert_match matcher, flash[key]
+    # flash and flash.now values are combined in `flash` attribute, so
+    # distinguish them by checking values to keep for next request
+    keep = flash.to_session_value.to_h["flashes"].to_h
+    if now
+      refute_includes keep, key.to_s
+    else
+      assert_includes keep, key.to_s
+    end
   end
 
 end

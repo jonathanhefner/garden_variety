@@ -4,6 +4,8 @@ require "rails/generators/base"
 module Garden
   module Generators
     class ScaffoldGenerator < Rails::Generators::Base
+      source_root File.join(__dir__, "templates")
+
       argument :resource, type: :string
 
       # NOTE: an appropriate default value for template_engine (e.g.
@@ -18,6 +20,10 @@ module Garden
       def initialize(raw_args, raw_opts, config)
         @argv = raw_args + raw_opts
         super
+      end
+
+      def ensure_locales
+        directory "../../install/templates/locales", "config/locales", skip: true
       end
 
       def generate_scaffolding

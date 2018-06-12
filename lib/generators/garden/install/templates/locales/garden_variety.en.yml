@@ -1,0 +1,10 @@
+en:
+  create:
+    success: '%{resource_capitalized} was successfully created.'
+    error: 'Could not create %{resource_name}.'
+  update:
+    success: '%{resource_capitalized} was successfully updated.'
+    error: 'Could not update %{resource_name}.'
+  destroy:
+    success: '%{resource_capitalized} was successfully destroyed.'
+    error: 'Could not destroy %{resource_name}.'

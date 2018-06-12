@@ -48,8 +48,10 @@ class PostsController < ApplicationController
   def create
     self.resource = vest(new_resource)
     if resource.save
+      flash[:success] = flash_message(:success)
       redirect_to resource
     else
+      flash.now[:error] = flash_message(:error)
       render :new
     end
   end
@@ -62,8 +64,10 @@ class PostsController < ApplicationController
   def update
     self.resource = vest(find_resource)
     if resource.save
+      flash[:success] = flash_message(:success)
       redirect_to resource
     else
+      flash.now[:error] = flash_message(:error)
       render :edit
     end
   end
@@ -72,8 +76,10 @@ class PostsController < ApplicationController
     self.resource = find_resource
     authorize(resource)
     if resource.destroy
+      flash[:success] = flash_message(:success)
       redirect_to action: :index
     else
+      flash[:error] = flash_message(:error)
       redirect_back(fallback_location: { action: :show })
     end
   end
@@ -116,6 +122,22 @@ class PostsController < ApplicationController
     authorize(model)
     model.assign_attributes(permitted_attributes(model))
     model
+  end
+
+  def flash_options
+    { resource_name: "post", resource_capitalized: "Post" }
+  end
+
+  def flash_message(status)
+    keys = [
+      :"posts.#{action_name}.#{status}",
+      :"posts.#{action_name}.#{status}_html",
+      :"#{action_name}.#{status}",
+      :"#{action_name}.#{status}_html",
+      :"#{status}",
+      :"#{status}_html",
+    ]
+    helpers.translate(keys.first, default: keys.drop(1), **flash_options)
   end
 
 end
@@ -183,6 +205,33 @@ generator in a few small ways:
 * No scaffold CSS (i.e. no "app/assets/stylesheets/scaffolds.scss").
 * No jbuilder templates.  Only HTML templates are generated.
 * `rails generate pundit:policy` is invoked for the specified model.
+
+
+## Flash messages
+
+Flash messages are defined using I18n.  The *garden_variety* installer
+(`rails generate garden:install`) will create a
+"config/locales/garden_variety.en.yml" file containing default "success"
+and "error" messages.  You can edit this file to customize those
+messages, or add your own translation files to support other languages.
+
+As seen in the `PostsController#flash_message` method in the example
+above, a prioritized list of keys are tried when retrieving a flash
+message.  Keys specific to the controller are tried first, followed by
+keys specific to the action, and then finally generic status keys.  For
+each level of specificity, `*_html` key variants are supported, which
+allow raw HTML to be included in flash messages and not be escaped when
+rendered.  (See the [Safe HTML Translations] section of the Rails
+Internationalization guide for more information.)
+
+Interpolation in flash messages is also supported (as described by
+[Passing Variables to Translations]), with interpolation values provided
+by the `flash_options` method.  By default, `flash_options` provides
+`resource_name` and `resource_capitalized` values, but you can override
+it to provide your own values.
+
+[Safe HTML Translations]: http://guides.rubyonrails.org/i18n.html#using-safe-html-translations
+[Passing Variables to Translations]: http://guides.rubyonrails.org/i18n.html#passing-variables-to-translations
 
 
 ## Beyond garden variety behavior
@@ -391,12 +440,13 @@ Then execute:
 $ bundle install
 ```
 
-And finally, if you haven't already used and installed Pundit, run the
-Pundit installation generator:
+And finally, run the *garden_variety* install generator:
 
 ```bash
-$ rails generate pundit:install
+$ rails generate garden:install
 ```
+
+This will also run the Pundit install generator, if necessary.
 
 
 ## Contributing

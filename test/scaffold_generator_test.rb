@@ -13,9 +13,11 @@ class ScaffoldGeneratorTest < Rails::Generators::TestCase
       FileUtils.copy_entry("dummy/bin", "tmp/bin")
       FileUtils.copy_entry("dummy/config", "tmp/config")
     end
- end
+  end
 
-  def test_necessary_files_are_created
+  def test_generates_scaffold_files
+    assert_file "config/locales/garden_variety.en.yml"
+
     resource = "fruit"
     run_generator([resource, "name:string", "--primary-key-type=uuid"])
 
@@ -30,5 +32,13 @@ class ScaffoldGeneratorTest < Rails::Generators::TestCase
     end
     assert_file "app/controllers/#{resource.pluralize}_controller.rb", /^\s+garden_variety$/
     assert_file "app/policies/#{resource}_policy.rb"
+  end
+
+  def test_generates_locales_if_missing
+    locales_file = "config/locales/garden_variety.en.yml"
+
+    File.delete(File.join(__dir__, "tmp", locales_file))
+    run_generator(["vegetable"])
+    assert_file locales_file
   end
 end

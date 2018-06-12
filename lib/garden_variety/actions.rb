@@ -40,8 +40,10 @@ module GardenVariety
     def create
       self.resource = vest(new_resource)
       if resource.save
+        flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(resource)
       else
+        flash.now[:error] = flash_message(:error)
         render :new
       end
     end
@@ -65,8 +67,10 @@ module GardenVariety
     def update
       self.resource = vest(find_resource)
       if resource.save
+        flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(resource)
       else
+        flash.now[:error] = flash_message(:error)
         render :edit
       end
     end
@@ -82,8 +86,10 @@ module GardenVariety
       self.resource = find_resource
       authorize(resource)
       if resource.destroy
+        flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(action: :index)
       else
+        flash[:error] = flash_message(:error)
         redirect_back(fallback_location: { action: :show })
       end
     end
