@@ -35,6 +35,8 @@ PostsController.class_eval do
     define_method(action) do
       if request.headers["X-Test-redirect_to"]
         super(){ redirect_to request.headers["X-Test-redirect_to"] }
+      elsif request.headers["X-Test-render_default"]
+        super(){}
       else
         super()
       end
@@ -144,12 +146,20 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "NEW!", new_post.title
   end
 
-  def test_create_with_callback
+  def test_create_with_custom_redirect
     expected_path = "/?test"
     post posts_path, params: { post: { title: "NEW!" } },
       headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
     assert_flash_message :success
+    assert_equal "NEW!", Post.order(:created_at).last.title
+  end
+
+  def test_create_with_render_default
+    post posts_path, params: { post: { title: "NEW!" } },
+      headers: { "X-Test-render_default" => true }
+    assert_response :no_content
+    assert_flash_message :success, now: true
     assert_equal "NEW!", Post.order(:created_at).last.title
   end
 
@@ -191,12 +201,20 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
-  def test_update_with_callback
+  def test_update_with_custom_redirect
     expected_path = "/?test"
     put post_path(AN_ID), params: { post: { title: "UPDATED!" } },
       headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
     assert_flash_message :success
+    assert_equal "UPDATED!", Post.find(AN_ID).title
+  end
+
+  def test_update_with_render_default
+    put post_path(AN_ID), params: { post: { title: "UPDATED!" } },
+      headers: { "X-Test-render_default" => true }
+    assert_response :no_content
+    assert_flash_message :success, now: true
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
@@ -224,11 +242,18 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     refute Post.exists?(AN_ID)
   end
 
-  def test_destroy_with_callback
+  def test_destroy_with_custom_redirect
     expected_path = "/?test"
     delete post_path(AN_ID), headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
     assert_flash_message :success
+    refute Post.exists?(AN_ID)
+  end
+
+  def test_destroy_with_render_default
+    delete post_path(AN_ID), headers: { "X-Test-render_default" => true }
+    assert_response :no_content
+    assert_flash_message :success, now: true
     refute Post.exists?(AN_ID)
   end
 

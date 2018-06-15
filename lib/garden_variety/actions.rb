@@ -1,5 +1,7 @@
 module GardenVariety
 
+  REDIRECT_CODES = [301, 302, 303, 307, 308]
+
   module IndexAction
     # Garden variety controller +index+ action.
     # @return [void]
@@ -42,6 +44,7 @@ module GardenVariety
       if resource.save
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(resource)
+        flash.discard(:success) if REDIRECT_CODES.exclude?(response.status)
       else
         flash.now[:error] = flash_message(:error)
         render :new
@@ -69,6 +72,7 @@ module GardenVariety
       if resource.save
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(resource)
+        flash.discard(:success) if REDIRECT_CODES.exclude?(response.status)
       else
         flash.now[:error] = flash_message(:error)
         render :edit
@@ -88,6 +92,7 @@ module GardenVariety
       if resource.destroy
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(action: :index)
+        flash.discard(:success) if REDIRECT_CODES.exclude?(response.status)
       else
         flash.now[:error] = flash_message(:error)
         render :show
