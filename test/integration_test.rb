@@ -79,7 +79,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_index
     get posts_path
     assert_response :success
-    assert_equal "test", response.headers["X-Test-list_resources"]
+    assert_used :list_resources
     Post.pluck(:id).each do |id|
       assert_select "a[href=?]", post_path(id)
     end
@@ -94,46 +94,53 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   def test_index_forbidden
     PostPolicy.allow_all = false
-    assert_raises(Pundit::NotAuthorizedError) { get posts_path }
+    assert_raises(Pundit::NotAuthorizedError) do
+      get posts_path
+    end
   end
 
   def test_show
     get post_path(AN_ID)
     assert_response :success
-    assert_equal "test", response.headers["X-Test-find_resource"]
-    assert_select "a[href=?]", edit_post_path(AN_ID)
+    assert_used :find_resource
+    assert_rendered_show AN_ID
   end
 
   def test_show_forbidden
     PostPolicy.allow_all = false
-    assert_raises(Pundit::NotAuthorizedError) { get post_path(AN_ID) }
+    assert_raises(Pundit::NotAuthorizedError) do
+      get post_path(AN_ID)
+    end
   end
 
   def test_new
     get new_post_path
     assert_response :success
-    assert_equal "test", response.headers["X-Test-new_resource"]
-    assert_select "form[action=?]", posts_path
+    assert_used :new_resource
+    assert_rendered_new
   end
 
   def test_new_with_params
     get new_post_path, params: { post: { title: "POPULATED!" } }
     assert_response :success
+    assert_rendered_new
     assert_select 'input[name="post[title]"][value=?]', "POPULATED!"
     refute Post.where(title: "POPULATED!").exists?
   end
 
   def test_new_forbidden
     PostPolicy.allow_all = false
-    assert_raises(Pundit::NotAuthorizedError) { get new_post_path }
+    assert_raises(Pundit::NotAuthorizedError) do
+      get new_post_path
+    end
   end
 
   def test_create
     post posts_path, params: { post: { title: "NEW!" } }
-    assert_equal "test", response.headers["X-Test-new_resource"]
+    assert_used :new_resource
     new_post = Post.order(:created_at).last
     assert_redirected_to new_post
-    assert_flash :success, "test flash_message"
+    assert_flash_message :success
     assert_equal "NEW!", new_post.title
   end
 
@@ -142,15 +149,15 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     post posts_path, params: { post: { title: "NEW!" } },
       headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
-    assert_flash :success, "test flash_message"
+    assert_flash_message :success
     assert_equal "NEW!", Post.order(:created_at).last.title
   end
 
   def test_create_validation_fails
     post posts_path, params: { post: { title: "BAD!" } }
     assert_response :success
-    assert_flash :error, "test flash_message", now: true
-    assert_select "form[action=?]", posts_path
+    assert_flash_message :error, now: true
+    assert_rendered_new
     refute Post.where(title: "BAD!").exists?
   end
 
@@ -165,20 +172,22 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_edit
     get edit_post_path(AN_ID)
     assert_response :success
-    assert_equal "test", response.headers["X-Test-find_resource"]
-    assert_select "form[action=?]", post_path(AN_ID)
+    assert_used :find_resource
+    assert_rendered_edit(AN_ID)
   end
 
   def test_edit_forbidden
     PostPolicy.allow_all = false
-    assert_raises(Pundit::NotAuthorizedError) { get edit_post_path(AN_ID) }
+    assert_raises(Pundit::NotAuthorizedError) do
+      get edit_post_path(AN_ID)
+    end
   end
 
   def test_update
     put post_path(AN_ID), params: { post: { title: "UPDATED!" } }
-    assert_equal "test", response.headers["X-Test-find_resource"]
+    assert_used :find_resource
     assert_redirected_to post_path(AN_ID)
-    assert_flash :success, "test flash_message"
+    assert_flash_message :success
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
@@ -187,15 +196,15 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     put post_path(AN_ID), params: { post: { title: "UPDATED!" } },
       headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
-    assert_flash :success, "test flash_message"
+    assert_flash_message :success
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
   def test_update_validation_fails
     put post_path(AN_ID), params: { post: { title: "BAD!" } }
     assert_response :success
-    assert_select "form[action=?]", post_path(AN_ID)
-    assert_flash :error, "test flash_message", now: true
+    assert_rendered_edit(AN_ID)
+    assert_flash_message :error, now: true
     refute_equal "BAD!", Post.find(AN_ID).title
   end
 
@@ -209,9 +218,9 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   def test_destroy
     delete post_path(AN_ID)
-    assert_equal "test", response.headers["X-Test-find_resource"]
+    assert_used :find_resource
     assert_redirected_to posts_path
-    assert_flash :success, "test flash_message"
+    assert_flash_message :success
     refute Post.exists?(AN_ID)
   end
 
@@ -219,7 +228,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     expected_path = "/?test"
     delete post_path(AN_ID), headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
-    assert_flash :success, "test flash_message"
+    assert_flash_message :success
     refute Post.exists?(AN_ID)
   end
 
@@ -227,7 +236,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     Post.find(AN_ID).update(title: "PERMANENT!")
     delete post_path(AN_ID)
     assert_redirected_to post_path(AN_ID)
-    assert_flash :error, "test flash_message"
+    assert_flash_message :error
     assert Post.exists?(AN_ID)
   end
 
@@ -235,7 +244,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     Post.find(AN_ID).update(title: "PERMANENT!")
     delete post_path(AN_ID), headers: { "HTTP_REFERER" => posts_path }
     assert_redirected_to posts_path
-    assert_flash :error, "test flash_message"
+    assert_flash_message :error
     assert Post.exists?(AN_ID)
   end
 
@@ -257,8 +266,12 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   private
 
-  def assert_flash(key, matcher, now: false)
-    assert_match matcher, flash[key]
+  def assert_used(name)
+    assert_equal "test", response.headers["X-Test-#{name}"]
+  end
+
+  def assert_flash_message(key, now: false)
+    assert_match "test flash_message", flash[key]
     # flash and flash.now values are combined in `flash` attribute, so
     # distinguish them by checking values to keep for next request
     keep = flash.to_session_value.to_h["flashes"].to_h
@@ -267,6 +280,19 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     else
       assert_includes keep, key.to_s
     end
+  end
+
+  def assert_rendered_show(post_id)
+    assert_select "a[href=?]", edit_post_path(post_id)
+    assert_select "a[href=?]", posts_path
+  end
+
+  def assert_rendered_new
+    assert_select "form[action=?]", posts_path
+  end
+
+  def assert_rendered_edit(post_id)
+    assert_select "form[action=?]", post_path(post_id)
   end
 
 end
