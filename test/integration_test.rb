@@ -235,16 +235,9 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_destroy_fails
     Post.find(AN_ID).update(title: "PERMANENT!")
     delete post_path(AN_ID)
-    assert_redirected_to post_path(AN_ID)
-    assert_flash_message :error
-    assert Post.exists?(AN_ID)
-  end
-
-  def test_destroy_fails_redirect_back
-    Post.find(AN_ID).update(title: "PERMANENT!")
-    delete post_path(AN_ID), headers: { "HTTP_REFERER" => posts_path }
-    assert_redirected_to posts_path
-    assert_flash_message :error
+    assert_response :success
+    assert_rendered_show(AN_ID)
+    assert_flash_message :error, now: true
     assert Post.exists?(AN_ID)
   end
 

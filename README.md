@@ -79,8 +79,8 @@ class PostsController < ApplicationController
       flash[:success] = flash_message(:success)
       redirect_to action: :index
     else
-      flash[:error] = flash_message(:error)
-      redirect_back(fallback_location: { action: :show })
+      flash.now[:error] = flash_message(:error)
+      render :show
     end
   end
 
