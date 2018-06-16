@@ -155,12 +155,13 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "NEW!", Post.order(:created_at).last.title
   end
 
-  def test_create_with_render_default
-    post posts_path, params: { post: { title: "NEW!" } },
+  def test_create_with_sjr
+    post "#{posts_path}.js", params: { post: { title: "SJR!" } },
       headers: { "X-Test-render_default" => true }
-    assert_response :no_content
+    assert_response :success
     assert_flash_message :success, now: true
-    assert_equal "NEW!", Post.order(:created_at).last.title
+    assert_rendered_sjr :create
+    assert_equal "SJR!", Post.order(:created_at).last.title
   end
 
   def test_create_validation_fails
@@ -210,12 +211,13 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "UPDATED!", Post.find(AN_ID).title
   end
 
-  def test_update_with_render_default
-    put post_path(AN_ID), params: { post: { title: "UPDATED!" } },
+  def test_update_with_sjr
+    put "#{post_path(AN_ID)}.js", params: { post: { title: "SJR!" } },
       headers: { "X-Test-render_default" => true }
-    assert_response :no_content
+    assert_response :success
     assert_flash_message :success, now: true
-    assert_equal "UPDATED!", Post.find(AN_ID).title
+    assert_rendered_sjr :update
+    assert_equal "SJR!", Post.find(AN_ID).title
   end
 
   def test_update_validation_fails
@@ -250,10 +252,11 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     refute Post.exists?(AN_ID)
   end
 
-  def test_destroy_with_render_default
-    delete post_path(AN_ID), headers: { "X-Test-render_default" => true }
-    assert_response :no_content
+  def test_destroy_with_sjr
+    delete "#{post_path(AN_ID)}.js", headers: { "X-Test-render_default" => true }
+    assert_response :success
     assert_flash_message :success, now: true
+    assert_rendered_sjr :destroy
     refute Post.exists?(AN_ID)
   end
 
@@ -311,6 +314,11 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   def assert_rendered_edit(post_id)
     assert_select "form[action=?]", post_path(post_id)
+  end
+
+  def assert_rendered_sjr(action)
+    assert_includes %w[text/javascript application/javascript], response.content_type
+    assert_match "alert(\"#{action}\")", response.body
   end
 
 end
