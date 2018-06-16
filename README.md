@@ -240,28 +240,11 @@ it to provide your own values.
 written, including in situations where custom code is unavoidable.
 
 
-### Integrating with search
-
-It is possible to integrate searching functionality by overriding the
-`index` action.  However, it can be simpler to override the
-`list_resources` method instead:
-
-```ruby
-class PostsController < ApplicationController
-  garden_variety
-
-  def list_resources
-    params[:author] ? super.where(author: params[:author]) : super
-  end
-end
-```
-
-
 ### Integrating with pagination
 
-Your favorite pagination gem (*may I suggest
-[foliate](https://rubygems.org/gems/foliate)?*) can also be integrated
-by overriding the `list_resources` action:
+You can integrate your your favorite pagination gem (*may I suggest
+[foliate](https://rubygems.org/gems/foliate)?*) by overriding the
+`list_resources` method:
 
 ```ruby
 class PostsController < ApplicationController
@@ -269,6 +252,22 @@ class PostsController < ApplicationController
 
   def list_resources
     paginate(super)
+  end
+end
+```
+
+
+### Integrating with search
+
+You can also integrate search functionality by overriding the
+`list_resources` method:
+
+```ruby
+class PostsController < ApplicationController
+  garden_variety
+
+  def list_resources
+    params[:author] ? super.where(author: params[:author]) : super
   end
 end
 ```
