@@ -1,3 +1,10 @@
+## 2.0
+
+* Support flash messages
+* Handle `destroy` failures by rendering `show` template
+* Support SJR (Server-generated JavaScript Response) integration
+
+
 ## 1.2
 
 * Accept model params in `new` action, enabling pre-populating forms via
