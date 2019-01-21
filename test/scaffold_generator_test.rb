@@ -1,5 +1,5 @@
-require "test_helper"
 require "fileutils"
+require "test_helper"
 require "generators/garden/scaffold/scaffold_generator"
 
 class ScaffoldGeneratorTest < Rails::Generators::TestCase

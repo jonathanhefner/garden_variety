@@ -1,2 +1,6 @@
+require "pundit"
 require "garden_variety/version"
+require "garden_variety/actions"
+require "garden_variety/controller"
+require "garden_variety/current_user_stub"
 require "garden_variety/railtie"

@@ -1,6 +1,6 @@
-require "test_helper"
 require "fileutils"
 require "timeout"
+require "test_helper"
 require "generators/garden/install/install_generator"
 
 class InstallGeneratorTest < Rails::Generators::TestCase

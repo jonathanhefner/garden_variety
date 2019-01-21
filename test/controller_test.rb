@@ -1,5 +1,5 @@
 require "test_helper"
-require "garden_variety/controller"
+require "garden_variety"
 
 
 class DefaultUsage < ActiveRecord::Base; end

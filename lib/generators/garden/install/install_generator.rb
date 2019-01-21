@@ -1,5 +1,3 @@
-require "rails/generators/base"
-
 # @!visibility private
 module Garden
   module Generators

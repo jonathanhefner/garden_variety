@@ -1,7 +1,3 @@
-require "rails/railtie"
-require "garden_variety/controller"
-require "garden_variety/current_user_stub"
-
 module GardenVariety
   # @!visibility private
   class Railtie < Rails::Railtie

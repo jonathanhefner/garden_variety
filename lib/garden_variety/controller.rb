@@ -1,6 +1,3 @@
-require "pundit"
-require "garden_variety/actions"
-
 module GardenVariety
   module Controller
     extend ActiveSupport::Concern
