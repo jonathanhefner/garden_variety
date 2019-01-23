@@ -6,7 +6,7 @@ module GardenVariety
     # Garden variety controller +index+ action.
     # @return [void]
     def index
-      authorize(resource_class)
+      authorize(self.class.resource_class)
       self.resources = policy_scope(list_resources)
     end
   end
@@ -23,7 +23,7 @@ module GardenVariety
     # Garden variety controller +new+ action.
     # @return [void]
     def new
-      if params.key?(resource_class.model_name.param_key)
+      if params.key?(self.class.resource_class.model_name.param_key)
         self.resource = vest(new_resource)
       else
         self.resource = authorize(new_resource)

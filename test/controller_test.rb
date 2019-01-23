@@ -33,7 +33,8 @@ class CustomYuuseju < ActiveRecord::Base; end
 
 class CustomUsagesController < ActionController::Base
   include GardenVariety::Controller
-  garden_variety :index, :show, resources: :custom_yuusejus
+  self.resource_class = CustomYuuseju
+  garden_variety :index, :show
 end
 
 
@@ -66,7 +67,7 @@ class ControllerTest < Minitest::Test
 
   def test_resource_class
     CONTROLLER_MODELS.each do |controller_class, model_class|
-      assert_equal model_class, controller_class.new.send(:resource_class)
+      assert_equal model_class, controller_class.resource_class
     end
   end
 

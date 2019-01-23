@@ -27,7 +27,7 @@ end
 class PostsController < ApplicationController
 
   def index
-    authorize(resource_class)
+    authorize(self.class.resource_class)
     self.resources = policy_scope(list_resources)
   end
 
@@ -36,7 +36,7 @@ class PostsController < ApplicationController
   end
 
   def new
-    if params.key?(resource_class.model_name.param_key)
+    if params.key?(self.class.resource_class.model_name.param_key)
       self.resource = vest(new_resource)
     else
       self.resource = authorize(new_resource)
@@ -82,7 +82,7 @@ class PostsController < ApplicationController
 
   private
 
-  def resource_class
+  def self.resource_class
     Post
   end
 
@@ -103,15 +103,15 @@ class PostsController < ApplicationController
   end
 
   def list_resources
-    resource_class.all
+    self.class.resource_class.all
   end
 
   def find_resource
-    resource_class.find(params[:id])
+    self.class.resource_class.find(params[:id])
   end
 
   def new_resource
-    resource_class.new
+    self.class.resource_class.new
   end
 
   def vest(model)
@@ -139,12 +139,13 @@ class PostsController < ApplicationController
 end
 ```
 
-The implementations of the `resource_class` and `resource` / `resources`
-accessor methods are dictated by the controller name by default.  They
-can be synchronously overridden with an optional argument to the
-`garden_variety` macro.  The rest of the methods can be overridden as
-normal, a la carte.  For a detailed description of method behavior, see
-the [full documentation](http://www.rubydoc.info/gems/garden_variety/).
+The `::resource_class` method returns a class corresponding to the
+controller name, by default.  That value can be overridden using the
+matching `::resource_class=` setter.  The `resource` / `resources`
+accessor methods are dictated by `::resource_class`.  The rest of the
+methods can be overridden as normal, a la carte.  For a detailed
+description of method behavior, see the
+[full documentation](http://www.rubydoc.info/gems/garden_variety/).
 (Note that the `authorize`, `policy_scope`, and `permitted_attributes`
 methods are provided by Pundit.)
 
@@ -426,7 +427,8 @@ end
 
 ```ruby
 class PublishedPostsController < ApplicationController
-  garden_variety :index, resources: :posts
+  self.resource_class = Post
+  garden_variety :index
 
   def list_resources
     super.where(published: true)
@@ -434,10 +436,10 @@ class PublishedPostsController < ApplicationController
 end
 ```
 
-Note the `resources:` argument to the `garden_variety` macro.  The
-resource class for `PublishedPostsController` will be overridden as
-`Post` instead of derived as `PublishedPost`.  Likewise, the `@posts`
-instance variable will be used instead of `@published_posts`.
+Notice the call to `::resource_class=`.  The resource class for
+`PublishedPostsController` is overridden as `Post` instead of derived as
+`PublishedPost`.  And because of this override, the `@posts` instance
+variable will be used instead of `@published_posts`.
 
 This example may be somewhat contrived, but there is an excellent talk
 from RailsConf which delves deeper into the principle:

@@ -10,10 +10,14 @@ module GardenVariety
       # typical REST actions (index, show, new, create, edit, update,
       # destroy) are included.
       #
-      # The optional +resources:+ parameter dictates which model class
-      # and instance variables these actions use.  The parameter's
-      # default value derives from the controller name.  The value must
-      # be a resource name in plural form.
+      # See also:
+      # - {GardenVariety::IndexAction}
+      # - {GardenVariety::ShowAction}
+      # - {GardenVariety::NewAction}
+      # - {GardenVariety::CreateAction}
+      # - {GardenVariety::EditAction}
+      # - {GardenVariety::UpdateAction}
+      # - {GardenVariety::DestroyAction}
       #
       # @example default usage
       #   # This...
@@ -30,101 +34,63 @@ module GardenVariety
       #     include GardenVariety::EditAction
       #     include GardenVariety::UpdateAction
       #     include GardenVariety::DestroyAction
-      #
-      #     private
-      #
-      #     def resource_class
-      #       Post
-      #     end
-      #
-      #     def resources
-      #       @posts
-      #     end
-      #
-      #     def resources=(models)
-      #       @posts = models
-      #     end
-      #
-      #     def resource
-      #       @post
-      #     end
-      #
-      #     def resource=(model)
-      #       @post = model
-      #     end
       #   end
       #
-      # @example custom usage
+      # @example specific usage
       #   # This...
-      #   class CountriesController < ApplicationController
-      #     garden_variety :index, resources: :locations
+      #   class PostsController < ApplicationController
+      #     garden_variety :index, :show
       #   end
       #
       #   # ...is equivalent to:
-      #   class CountriesController < ApplicationController
+      #   class PostsController < ApplicationController
       #     include GardenVariety::IndexAction
-      #
-      #     private
-      #
-      #     def resource_class
-      #       Location
-      #     end
-      #
-      #     def resources
-      #       @locations
-      #     end
-      #
-      #     def resources=(models)
-      #       @locations = models
-      #     end
-      #
-      #     def resource
-      #       @location
-      #     end
-      #
-      #     def resource=(model)
-      #       @location = model
-      #     end
+      #     include GardenVariety::ShowAction
       #   end
       #
       # @param actions [Array<:index, :show, :new, :create, :edit, :update, :destroy>]
-      # @param resources [Symbol, String]
       # @return [void]
-      def garden_variety(*actions, resources: controller_path)
-        class_eval <<-CODE
-          private
-
-          def resource_class # optimized override
-            #{resources.to_s.classify}
-          end
-        CODE
-
+      def garden_variety(*actions)
         action_modules = actions.empty? ?
           ::GardenVariety::ACTION_MODULES.values :
           ::GardenVariety::ACTION_MODULES.values_at(*actions)
 
         action_modules.each{|m| include m }
       end
-    end
 
+      # Returns the controller resource class.  Defaults to a class
+      # corresponding to the singular-form of the controller name.
+      #
+      # @example
+      #   class PostsController < ApplicationController
+      #   end
+      #
+      #   PostsController.resource_class  # == Post (class)
+      #
+      # @return [Class]
+      def resource_class
+        @resource_class ||= controller_path.classify.constantize
+      end
+
+      # Sets the controller resource class.
+      #
+      # @example
+      #   class PublishedPostsController < ApplicationController
+      #     self.resource_class = Post
+      #   end
+      #
+      # @param klass [Class]
+      # @return [klass]
+      def resource_class=(klass)
+        @resource_class = klass
+      end
+    end
 
     private
 
     # @!visibility public
-    # Returns the class of the resource corresponding to the controller
-    # name.
-    #
-    # @example
-    #   PostsController.new.resource_class  # == Post (class)
-    #
-    # @return [Class]
-    def resource_class
-      @resource_class ||= controller_path.classify.constantize
-    end
-
-    # @!visibility public
     # Returns the value of the singular-form instance variable dictated
-    # by {resource_class}.
+    # by {::resource_class}.
     #
     # @example
     #   class PostsController
@@ -138,12 +104,12 @@ module GardenVariety
     #
     # @return [Object]
     def resource
-      instance_variable_get("@#{resource_class.to_s.underscore.tr("/", "_")}")
+      instance_variable_get("@#{self.class.resource_class.to_s.underscore.tr("/", "_")}")
     end
 
     # @!visibility public
     # Sets the value of the singular-form instance variable dictated
-    # by {resource_class}.
+    # by {::resource_class}.
     #
     # @example
     #   class PostsController
@@ -158,12 +124,12 @@ module GardenVariety
     # @param value [Object]
     # @return [value]
     def resource=(value)
-      instance_variable_set("@#{resource_class.to_s.underscore.tr("/", "_")}", value)
+      instance_variable_set("@#{self.class.resource_class.to_s.underscore.tr("/", "_")}", value)
     end
 
     # @!visibility public
     # Returns the value of the plural-form instance variable dictated
-    # by {resource_class}.
+    # by {::resource_class}.
     #
     # @example
     #   class PostsController
@@ -177,12 +143,12 @@ module GardenVariety
     #
     # @return [Object]
     def resources
-      instance_variable_get("@#{resource_class.to_s.tableize.tr("/", "_")}")
+      instance_variable_get("@#{self.class.resource_class.to_s.tableize.tr("/", "_")}")
     end
 
     # @!visibility public
     # Sets the value of the plural-form instance variable dictated
-    # by {resource_class}.
+    # by {::resource_class}.
     #
     # @example
     #   class PostsController
@@ -197,7 +163,7 @@ module GardenVariety
     # @param values [Object]
     # @return [values]
     def resources=(values)
-      instance_variable_set("@#{resource_class.to_s.tableize.tr("/", "_")}", values)
+      instance_variable_set("@#{self.class.resource_class.to_s.tableize.tr("/", "_")}", values)
     end
 
     # @!visibility public
@@ -214,7 +180,7 @@ module GardenVariety
     #
     # @return [ActiveRecord::Relation]
     def list_resources
-      resource_class.all
+      self.class.resource_class.all
     end
 
     # @!visibility public
@@ -232,7 +198,7 @@ module GardenVariety
     #
     # @return [ActiveRecord::Base]
     def find_resource
-      resource_class.find(params[:id])
+      self.class.resource_class.find(params[:id])
     end
 
     # @!visibility public
@@ -248,7 +214,7 @@ module GardenVariety
     #
     # @return [ActiveRecord::Base]
     def new_resource
-      resource_class.new
+      self.class.resource_class.new
     end
 
     # @!visibility public
@@ -289,8 +255,8 @@ module GardenVariety
     #
     # @return [Hash]
     def flash_options
-      { resource_name: resource_class.model_name.human.downcase,
-        resource_capitalized: resource_class.model_name.human }
+      { resource_name: self.class.resource_class.model_name.human.downcase,
+        resource_capitalized: self.class.resource_class.model_name.human }
     end
 
     # @!visibility public
