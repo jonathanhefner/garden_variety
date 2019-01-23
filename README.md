@@ -32,16 +32,14 @@ class PostsController < ApplicationController
   end
 
   def show
-    self.resource = find_resource
-    authorize(resource)
+    self.resource = authorize(find_resource)
   end
 
   def new
     if params.key?(resource_class.model_name.param_key)
       self.resource = vest(new_resource)
     else
-      self.resource = new_resource
-      authorize(resource)
+      self.resource = authorize(new_resource)
     end
   end
 
@@ -57,8 +55,7 @@ class PostsController < ApplicationController
   end
 
   def edit
-    self.resource = find_resource
-    authorize(resource)
+    self.resource = authorize(find_resource)
   end
 
   def update
@@ -73,8 +70,7 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    self.resource = find_resource
-    authorize(resource)
+    self.resource = authorize(find_resource)
     if resource.destroy
       flash[:success] = flash_message(:success)
       redirect_to action: :index

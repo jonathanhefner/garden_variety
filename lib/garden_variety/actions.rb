@@ -15,8 +15,7 @@ module GardenVariety
     # Garden variety controller +show+ action.
     # @return [void]
     def show
-      self.resource = find_resource
-      authorize(resource)
+      self.resource = authorize(find_resource)
     end
   end
 
@@ -27,8 +26,7 @@ module GardenVariety
       if params.key?(resource_class.model_name.param_key)
         self.resource = vest(new_resource)
       else
-        self.resource = new_resource
-        authorize(resource)
+        self.resource = authorize(new_resource)
       end
     end
   end
@@ -56,8 +54,7 @@ module GardenVariety
     # Garden variety controller +edit+ action.
     # @return [void]
     def edit
-      self.resource = find_resource
-      authorize(resource)
+      self.resource = authorize(find_resource)
     end
   end
 
@@ -87,8 +84,7 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def destroy
-      self.resource = find_resource
-      authorize(resource)
+      self.resource = authorize(find_resource)
       if resource.destroy
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(action: :index)
