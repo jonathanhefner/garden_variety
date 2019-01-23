@@ -38,7 +38,7 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def create
-      self.resource = vest(new_resource)
+      self.resource = (resource = vest(new_resource))
       if resource.save
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(resource)
@@ -65,7 +65,7 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def update
-      self.resource = vest(find_resource)
+      self.resource = (resource = vest(find_resource))
       if resource.save
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(resource)
@@ -84,7 +84,7 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def destroy
-      self.resource = authorize(find_resource)
+      self.resource = (resource = authorize(find_resource))
       if resource.destroy
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(action: :index)

@@ -15,11 +15,6 @@ module GardenVariety
       # default value derives from the controller name.  The value must
       # be a resource name in plural form.
       #
-      # The macro also defines the following accessor methods for use in
-      # generic action and helper methods: +resources+, +resources=+,
-      # +resource+, and +resource=+.  These accessors get and set the
-      # instance variables dictated by the +resources:+ parameter.
-      #
       # @example default usage
       #   # This...
       #   class PostsController < ApplicationController
@@ -96,29 +91,11 @@ module GardenVariety
       # @param resources [Symbol, String]
       # @return [void]
       def garden_variety(*actions, resources: controller_path)
-        resources_attr = resources.to_s.underscore.tr("/", "_")
-
         class_eval <<-CODE
           private
 
           def resource_class # optimized override
             #{resources.to_s.classify}
-          end
-
-          def resources
-            @#{resources_attr}
-          end
-
-          def resources=(models)
-            @#{resources_attr} = models
-          end
-
-          def resource
-            @#{resources_attr.singularize}
-          end
-
-          def resource=(model)
-            @#{resources_attr.singularize} = model
           end
         CODE
 
@@ -143,6 +120,84 @@ module GardenVariety
     # @return [Class]
     def resource_class
       @resource_class ||= controller_path.classify.constantize
+    end
+
+    # @!visibility public
+    # Returns the value of the singular-form instance variable dictated
+    # by {resource_class}.
+    #
+    # @example
+    #   class PostsController
+    #     def show
+    #       # This...
+    #       self.resource
+    #       # ...is equivalent to:
+    #       @post
+    #     end
+    #   end
+    #
+    # @return [Object]
+    def resource
+      instance_variable_get("@#{resource_class.to_s.underscore.tr("/", "_")}")
+    end
+
+    # @!visibility public
+    # Sets the value of the singular-form instance variable dictated
+    # by {resource_class}.
+    #
+    # @example
+    #   class PostsController
+    #     def show
+    #       # This...
+    #       self.resource = value
+    #       # ...is equivalent to:
+    #       @post = value
+    #     end
+    #   end
+    #
+    # @param value [Object]
+    # @return [value]
+    def resource=(value)
+      instance_variable_set("@#{resource_class.to_s.underscore.tr("/", "_")}", value)
+    end
+
+    # @!visibility public
+    # Returns the value of the plural-form instance variable dictated
+    # by {resource_class}.
+    #
+    # @example
+    #   class PostsController
+    #     def index
+    #       # This...
+    #       self.resources
+    #       # ...is equivalent to:
+    #       @posts
+    #     end
+    #   end
+    #
+    # @return [Object]
+    def resources
+      instance_variable_get("@#{resource_class.to_s.tableize.tr("/", "_")}")
+    end
+
+    # @!visibility public
+    # Sets the value of the plural-form instance variable dictated
+    # by {resource_class}.
+    #
+    # @example
+    #   class PostsController
+    #     def index
+    #       # This...
+    #       self.resources = values
+    #       # ...is equivalent to:
+    #       @posts = values
+    #     end
+    #   end
+    #
+    # @param values [Object]
+    # @return [values]
+    def resources=(values)
+      instance_variable_set("@#{resource_class.to_s.tableize.tr("/", "_")}", values)
     end
 
     # @!visibility public

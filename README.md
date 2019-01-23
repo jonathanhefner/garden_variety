@@ -140,11 +140,11 @@ end
 ```
 
 The implementations of the `resource_class` and `resource` / `resources`
-accessor methods are generated based on the controller name.  They can
-be altered with an optional argument to the `garden_variety` macro.  The
-rest of the methods can be overridden as normal, a la carte.  For a
-detailed description of method behavior, see the
-[full documentation](http://www.rubydoc.info/gems/garden_variety/).
+accessor methods are dictated by the controller name by default.  They
+can be synchronously overridden with an optional argument to the
+`garden_variety` macro.  The rest of the methods can be overridden as
+normal, a la carte.  For a detailed description of method behavior, see
+the [full documentation](http://www.rubydoc.info/gems/garden_variety/).
 (Note that the `authorize`, `policy_scope`, and `permitted_attributes`
 methods are provided by Pundit.)
 
