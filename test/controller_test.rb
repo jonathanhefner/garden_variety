@@ -33,7 +33,7 @@ class CustomYuuseju < ActiveRecord::Base; end
 
 class CustomUsagesController < ActionController::Base
   include GardenVariety::Controller
-  self.resource_class = CustomYuuseju
+  self.model_class = CustomYuuseju
   garden_variety :index, :show
 end
 
@@ -65,9 +65,9 @@ class ControllerTest < Minitest::Test
     assert_equal "Default usage", Namespaced::DefaultUsage.model_name.human
   end
 
-  def test_resource_class
+  def test_model_class
     CONTROLLER_MODELS.each do |controller_class, model_class|
-      assert_equal model_class, controller_class.resource_class
+      assert_equal model_class, controller_class.model_class
     end
   end
 
@@ -150,7 +150,7 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_flash_message_with_custom_resource
+  def test_flash_message_with_custom_model
     controller = CustomUsagesController.new
     controller.action_name = "test"
     status = "custom"

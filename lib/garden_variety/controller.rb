@@ -58,31 +58,31 @@ module GardenVariety
         action_modules.each{|m| include m }
       end
 
-      # Returns the controller resource class.  Defaults to a class
+      # Returns the controller model class.  Defaults to a class
       # corresponding to the singular-form of the controller name.
       #
       # @example
       #   class PostsController < ApplicationController
       #   end
       #
-      #   PostsController.resource_class  # == Post (class)
+      #   PostsController.model_class  # == Post (class)
       #
       # @return [Class]
-      def resource_class
-        @resource_class ||= controller_path.classify.constantize
+      def model_class
+        @model_class ||= controller_path.classify.constantize
       end
 
-      # Sets the controller resource class.
+      # Sets the controller model class.
       #
       # @example
       #   class PublishedPostsController < ApplicationController
-      #     self.resource_class = Post
+      #     self.model_class = Post
       #   end
       #
       # @param klass [Class]
       # @return [klass]
-      def resource_class=(klass)
-        @resource_class = klass
+      def model_class=(klass)
+        @model_class = klass
       end
     end
 
@@ -90,7 +90,7 @@ module GardenVariety
 
     # @!visibility public
     # Returns the value of the singular-form instance variable dictated
-    # by {::resource_class}.
+    # by {::model_class}.
     #
     # @example
     #   class PostsController
@@ -104,12 +104,12 @@ module GardenVariety
     #
     # @return [Object]
     def resource
-      instance_variable_get("@#{self.class.resource_class.to_s.underscore.tr("/", "_")}")
+      instance_variable_get("@#{self.class.model_class.to_s.underscore.tr("/", "_")}")
     end
 
     # @!visibility public
     # Sets the value of the singular-form instance variable dictated
-    # by {::resource_class}.
+    # by {::model_class}.
     #
     # @example
     #   class PostsController
@@ -124,12 +124,12 @@ module GardenVariety
     # @param value [Object]
     # @return [value]
     def resource=(value)
-      instance_variable_set("@#{self.class.resource_class.to_s.underscore.tr("/", "_")}", value)
+      instance_variable_set("@#{self.class.model_class.to_s.underscore.tr("/", "_")}", value)
     end
 
     # @!visibility public
     # Returns the value of the plural-form instance variable dictated
-    # by {::resource_class}.
+    # by {::model_class}.
     #
     # @example
     #   class PostsController
@@ -143,12 +143,12 @@ module GardenVariety
     #
     # @return [Object]
     def resources
-      instance_variable_get("@#{self.class.resource_class.to_s.tableize.tr("/", "_")}")
+      instance_variable_get("@#{self.class.model_class.to_s.tableize.tr("/", "_")}")
     end
 
     # @!visibility public
     # Sets the value of the plural-form instance variable dictated
-    # by {::resource_class}.
+    # by {::model_class}.
     #
     # @example
     #   class PostsController
@@ -163,7 +163,7 @@ module GardenVariety
     # @param values [Object]
     # @return [values]
     def resources=(values)
-      instance_variable_set("@#{self.class.resource_class.to_s.tableize.tr("/", "_")}", values)
+      instance_variable_set("@#{self.class.model_class.to_s.tableize.tr("/", "_")}", values)
     end
 
     # @!visibility public
@@ -180,7 +180,7 @@ module GardenVariety
     #
     # @return [ActiveRecord::Relation]
     def list_resources
-      self.class.resource_class.all
+      self.class.model_class.all
     end
 
     # @!visibility public
@@ -198,7 +198,7 @@ module GardenVariety
     #
     # @return [ActiveRecord::Base]
     def find_resource
-      self.class.resource_class.find(params[:id])
+      self.class.model_class.find(params[:id])
     end
 
     # @!visibility public
@@ -214,7 +214,7 @@ module GardenVariety
     #
     # @return [ActiveRecord::Base]
     def new_resource
-      self.class.resource_class.new
+      self.class.model_class.new
     end
 
     # @!visibility public
@@ -255,8 +255,8 @@ module GardenVariety
     #
     # @return [Hash]
     def flash_options
-      { resource_name: self.class.resource_class.model_name.human.downcase,
-        resource_capitalized: self.class.resource_class.model_name.human }
+      { resource_name: self.class.model_class.model_name.human.downcase,
+        resource_capitalized: self.class.model_class.model_name.human }
     end
 
     # @!visibility public
