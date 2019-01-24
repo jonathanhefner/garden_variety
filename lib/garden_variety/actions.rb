@@ -23,7 +23,7 @@ module GardenVariety
     # Garden variety controller +new+ action.
     # @return [void]
     def new
-      if params.key?(self.class.model_class.model_name.param_key)
+      if params.key?(self.class.model_name.param_key)
         self.model = vest(new_model)
       else
         self.model = authorize(new_model)

@@ -82,7 +82,13 @@ module GardenVariety
       # @param klass [Class]
       # @return [klass]
       def model_class=(klass)
+        @model_name = nil
         @model_class = klass
+      end
+
+      # @!visibility private
+      def model_name
+        @model_name ||= model_class.try(:model_name) || ActiveModel::Name.new(model_class)
       end
     end
 
@@ -104,7 +110,7 @@ module GardenVariety
     #
     # @return [Object]
     def model
-      instance_variable_get("@#{self.class.model_class.to_s.underscore.tr("/", "_")}")
+      instance_variable_get(:"@#{self.class.model_name.singular}")
     end
 
     # @!visibility public
@@ -124,7 +130,7 @@ module GardenVariety
     # @param value [Object]
     # @return [value]
     def model=(value)
-      instance_variable_set("@#{self.class.model_class.to_s.underscore.tr("/", "_")}", value)
+      instance_variable_set(:"@#{self.class.model_name.singular}", value)
     end
 
     # @!visibility public
@@ -143,7 +149,7 @@ module GardenVariety
     #
     # @return [Object]
     def collection
-      instance_variable_get("@#{self.class.model_class.to_s.tableize.tr("/", "_")}")
+      instance_variable_get(:"@#{self.class.model_name.plural}")
     end
 
     # @!visibility public
@@ -163,7 +169,7 @@ module GardenVariety
     # @param values [Object]
     # @return [values]
     def collection=(values)
-      instance_variable_set("@#{self.class.model_class.to_s.tableize.tr("/", "_")}", values)
+      instance_variable_set(:"@#{self.class.model_name.plural}", values)
     end
 
     # @!visibility public
@@ -255,8 +261,8 @@ module GardenVariety
     #
     # @return [Hash]
     def flash_options
-      { resource_name: self.class.model_class.model_name.human.downcase,
-        resource_capitalized: self.class.model_class.model_name.human }
+      { resource_name: self.class.model_name.human.downcase,
+        resource_capitalized: self.class.model_name.human }
     end
 
     # @!visibility public

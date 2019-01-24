@@ -29,7 +29,7 @@ class Namespaced::NoUsagesController < ActionController::Base
   include GardenVariety::Controller
 end
 
-class CustomYuuseju < ActiveRecord::Base; end
+class CustomYuuseju; end
 
 class CustomUsagesController < ActionController::Base
   include GardenVariety::Controller
@@ -55,10 +55,10 @@ class ControllerTest < Minitest::Test
     CustomUsagesController => CustomYuuseju,
   }.freeze
 
-  GARDEN_VARIETY_CONTROLLER_MODELS = CONTROLLER_MODELS.except(
+  GARDEN_VARIETY_CONTROLLERS = CONTROLLER_MODELS.except(
     NoUsagesController,
     Namespaced::NoUsagesController,
-  ).freeze
+  ).keys.freeze
 
   def test_assumptions
     assert_equal "namespaced_default_usage", Namespaced::DefaultUsage.model_name.singular
@@ -71,37 +71,51 @@ class ControllerTest < Minitest::Test
     end
   end
 
+  def test_model_name
+    CONTROLLER_MODELS.each do |controller_class, model_class|
+      assert_equal ActiveModel::Name.new(model_class), controller_class.model_name
+    end
+  end
+
+  def test_model_name_syncs_with_model_class
+    assert_equal DefaultUsage.model_name, DefaultUsagesController.model_name
+    DefaultUsagesController.model_class = CustomYuuseju
+    assert_equal CustomUsagesController.model_name, DefaultUsagesController.model_name
+  ensure
+    DefaultUsagesController.model_class = DefaultUsage # restore
+  end
+
   def test_collection_getter
-    GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
+    GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
-      collection_attr = model_class.model_name.plural
+      collection_attr = controller_class.model_name.plural
       controller.instance_eval("@#{collection_attr} = :expected")
       assert_equal :expected, controller.send(:collection)
     end
   end
 
   def test_collection_setter
-    GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
+    GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
-      collection_attr = model_class.model_name.plural
+      collection_attr = controller_class.model_name.plural
       assert_equal :expected, controller.send(:collection=, :expected)
       assert_equal :expected, controller.instance_eval("@#{collection_attr}")
     end
   end
 
   def test_model_getter
-    GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
+    GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
-      model_attr = model_class.model_name.singular
+      model_attr = controller_class.model_name.singular
       controller.instance_eval("@#{model_attr} = :expected")
       assert_equal :expected, controller.send(:model)
     end
   end
 
   def test_model_setter
-    GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
+    GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
-      model_attr = model_class.model_name.singular
+      model_attr = controller_class.model_name.singular
       assert_equal :expected, controller.send(:model=, :expected)
       assert_equal :expected, controller.instance_eval("@#{model_attr}")
     end
@@ -121,8 +135,8 @@ class ControllerTest < Minitest::Test
   end
 
   def test_flash_options
-    CONTROLLER_MODELS.each do |controller_class, model_class|
-      resource_name = model_class.model_name.human.downcase
+    CONTROLLER_MODELS.keys.each do |controller_class|
+      resource_name = controller_class.model_name.human.downcase
       actual = controller_class.new.send(:flash_options)
       assert_equal resource_name, actual[:resource_name]
       assert_equal resource_name.capitalize, actual[:resource_capitalized]
