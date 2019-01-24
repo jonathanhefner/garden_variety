@@ -28,7 +28,7 @@ class PostsController < ApplicationController
 
   def index
     authorize(self.class.model_class)
-    self.resources = policy_scope(list_resources)
+    self.collection = policy_scope(find_collection)
   end
 
   def show
@@ -86,11 +86,11 @@ class PostsController < ApplicationController
     Post
   end
 
-  def resources
+  def collection
     @posts
   end
 
-  def resources=(models)
+  def collection=(models)
     @posts = models
   end
 
@@ -102,7 +102,7 @@ class PostsController < ApplicationController
     @post = model
   end
 
-  def list_resources
+  def find_collection
     self.class.model_class.all
   end
 
@@ -141,10 +141,11 @@ end
 
 The `::model_class` method returns a class corresponding to the
 controller name, by default.  That value can be overridden using the
-matching `::model_class=` setter.  The `resource` / `resources` accessor
-methods are dictated by `::model_class`.  The rest of the methods can be
-overridden as normal, a la carte.  For a detailed description of method
-behavior, see the [full documentation](http://www.rubydoc.info/gems/garden_variety/).
+matching `::model_class=` setter.  The `resource` / `collection`
+accessor methods are dictated by `::model_class`.  The rest of the
+methods can be overridden as normal, a la carte.  For a detailed
+description of method behavior, see the
+[full documentation](http://www.rubydoc.info/gems/garden_variety/).
 (Note that the `authorize`, `policy_scope`, and `permitted_attributes`
 methods are provided by Pundit.)
 
@@ -240,13 +241,13 @@ written, including in situations where custom code is unavoidable.
 
 You can integrate your your favorite pagination gem (*may I suggest
 [foliate](https://rubygems.org/gems/foliate)?*) by overriding the
-`list_resources` method:
+`find_collection` method:
 
 ```ruby
 class PostsController < ApplicationController
   garden_variety
 
-  def list_resources
+  def find_collection
     paginate(super)
   end
 end
@@ -256,13 +257,13 @@ end
 ### Integrating with search
 
 You can also integrate search functionality by overriding the
-`list_resources` method:
+`find_collection` method:
 
 ```ruby
 class PostsController < ApplicationController
   garden_variety
 
-  def list_resources
+  def find_collection
     params[:author] ? super.where(author: params[:author]) : super
   end
 end
@@ -429,7 +430,7 @@ class PublishedPostsController < ApplicationController
   self.model_class = Post
   garden_variety :index
 
-  def list_resources
+  def find_collection
     super.where(published: true)
   end
 end

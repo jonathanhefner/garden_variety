@@ -43,8 +43,8 @@ PostsController.class_eval do
     end
   end
 
-  def list_resources
-    response.headers["X-Test-list_resources"] = "test"
+  def find_collection
+    response.headers["X-Test-find_collection"] = "test"
     super
   end
 
@@ -81,7 +81,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_index
     get posts_path
     assert_response :success
-    assert_used :list_resources
+    assert_used :find_collection
     Post.pluck(:id).each do |id|
       assert_select "a[href=?]", post_path(id)
     end

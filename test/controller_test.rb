@@ -71,21 +71,21 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_resources_getter
+  def test_collection_getter
     GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
       controller = controller_class.new
-      resources_attr = model_class.model_name.plural
-      controller.instance_eval("@#{resources_attr} = :expected")
-      assert_equal :expected, controller.send(:resources)
+      collection_attr = model_class.model_name.plural
+      controller.instance_eval("@#{collection_attr} = :expected")
+      assert_equal :expected, controller.send(:collection)
     end
   end
 
-  def test_resources_setter
+  def test_collection_setter
     GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
       controller = controller_class.new
-      resources_attr = model_class.model_name.plural
-      assert_equal :expected, controller.send(:resources=, :expected)
-      assert_equal :expected, controller.instance_eval("@#{resources_attr}")
+      collection_attr = model_class.model_name.plural
+      assert_equal :expected, controller.send(:collection=, :expected)
+      assert_equal :expected, controller.instance_eval("@#{collection_attr}")
     end
   end
 

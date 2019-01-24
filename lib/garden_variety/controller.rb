@@ -135,14 +135,14 @@ module GardenVariety
     #   class PostsController
     #     def index
     #       # This...
-    #       self.resources
+    #       self.collection
     #       # ...is equivalent to:
     #       @posts
     #     end
     #   end
     #
     # @return [Object]
-    def resources
+    def collection
       instance_variable_get("@#{self.class.model_class.to_s.tableize.tr("/", "_")}")
     end
 
@@ -154,7 +154,7 @@ module GardenVariety
     #   class PostsController
     #     def index
     #       # This...
-    #       self.resources = values
+    #       self.collection = values
     #       # ...is equivalent to:
     #       @posts = values
     #     end
@@ -162,24 +162,24 @@ module GardenVariety
     #
     # @param values [Object]
     # @return [values]
-    def resources=(values)
+    def collection=(values)
       instance_variable_set("@#{self.class.model_class.to_s.tableize.tr("/", "_")}", values)
     end
 
     # @!visibility public
-    # Returns an ActiveRecord::Relation representing resource instances
+    # Returns an ActiveRecord::Relation representing model instances
     # corresponding to the controller.  Designed for use in generic
     # +index+ action methods.
     #
     # @example
     #   class PostsController < ApplicationController
     #     def index
-    #        @posts = list_resources.where(status: "published")
+    #        @posts = find_collection.where(status: "published")
     #     end
     #   end
     #
     # @return [ActiveRecord::Relation]
-    def list_resources
+    def find_collection
       self.class.model_class.all
     end
 

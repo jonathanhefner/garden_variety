@@ -7,7 +7,7 @@ module GardenVariety
     # @return [void]
     def index
       authorize(self.class.model_class)
-      self.resources = policy_scope(list_resources)
+      self.collection = policy_scope(find_collection)
     end
   end
 
