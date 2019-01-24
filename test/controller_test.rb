@@ -89,21 +89,21 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_resource_getter
+  def test_model_getter
     GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
       controller = controller_class.new
-      resource_attr = model_class.model_name.singular
-      controller.instance_eval("@#{resource_attr} = :expected")
-      assert_equal :expected, controller.send(:resource)
+      model_attr = model_class.model_name.singular
+      controller.instance_eval("@#{model_attr} = :expected")
+      assert_equal :expected, controller.send(:model)
     end
   end
 
-  def test_resource_setter
+  def test_model_setter
     GARDEN_VARIETY_CONTROLLER_MODELS.each do |controller_class, model_class|
       controller = controller_class.new
-      resource_attr = model_class.model_name.singular
-      assert_equal :expected, controller.send(:resource=, :expected)
-      assert_equal :expected, controller.instance_eval("@#{resource_attr}")
+      model_attr = model_class.model_name.singular
+      assert_equal :expected, controller.send(:model=, :expected)
+      assert_equal :expected, controller.instance_eval("@#{model_attr}")
     end
   end
 

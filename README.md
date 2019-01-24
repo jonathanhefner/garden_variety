@@ -32,22 +32,22 @@ class PostsController < ApplicationController
   end
 
   def show
-    self.resource = authorize(find_resource)
+    self.model = authorize(find_model)
   end
 
   def new
     if params.key?(self.class.model_class.model_name.param_key)
-      self.resource = vest(new_resource)
+      self.model = vest(new_model)
     else
-      self.resource = authorize(new_resource)
+      self.model = authorize(new_model)
     end
   end
 
   def create
-    self.resource = vest(new_resource)
-    if resource.save
+    self.model = vest(new_model)
+    if model.save
       flash[:success] = flash_message(:success)
-      redirect_to resource
+      redirect_to model
     else
       flash.now[:error] = flash_message(:error)
       render :new
@@ -55,14 +55,14 @@ class PostsController < ApplicationController
   end
 
   def edit
-    self.resource = authorize(find_resource)
+    self.model = authorize(find_model)
   end
 
   def update
-    self.resource = vest(find_resource)
-    if resource.save
+    self.model = vest(find_model)
+    if model.save
       flash[:success] = flash_message(:success)
-      redirect_to resource
+      redirect_to model
     else
       flash.now[:error] = flash_message(:error)
       render :edit
@@ -70,8 +70,8 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    self.resource = authorize(find_resource)
-    if resource.destroy
+    self.model = authorize(find_model)
+    if model.destroy
       flash[:success] = flash_message(:success)
       redirect_to action: :index
     else
@@ -94,11 +94,11 @@ class PostsController < ApplicationController
     @posts = models
   end
 
-  def resource
+  def model
     @post
   end
 
-  def resource=(model)
+  def model=(model)
     @post = model
   end
 
@@ -106,11 +106,11 @@ class PostsController < ApplicationController
     self.class.model_class.all
   end
 
-  def find_resource
+  def find_model
     self.class.model_class.find(params[:id])
   end
 
-  def new_resource
+  def new_model
     self.class.model_class.new
   end
 
@@ -141,11 +141,10 @@ end
 
 The `::model_class` method returns a class corresponding to the
 controller name, by default.  That value can be overridden using the
-matching `::model_class=` setter.  The `resource` / `collection`
-accessor methods are dictated by `::model_class`.  The rest of the
-methods can be overridden as normal, a la carte.  For a detailed
-description of method behavior, see the
-[full documentation](http://www.rubydoc.info/gems/garden_variety/).
+matching `::model_class=` setter.  The `model` / `collection` accessor
+methods are dictated by `::model_class`.  The rest of the methods can be
+overridden as normal, a la carte.  For a detailed description of method
+behavior, see the [full documentation](http://www.rubydoc.info/gems/garden_variety/).
 (Note that the `authorize`, `policy_scope`, and `permitted_attributes`
 methods are provided by Pundit.)
 

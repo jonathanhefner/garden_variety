@@ -96,14 +96,14 @@ module GardenVariety
     #   class PostsController
     #     def show
     #       # This...
-    #       self.resource
+    #       self.model
     #       # ...is equivalent to:
     #       @post
     #     end
     #   end
     #
     # @return [Object]
-    def resource
+    def model
       instance_variable_get("@#{self.class.model_class.to_s.underscore.tr("/", "_")}")
     end
 
@@ -115,7 +115,7 @@ module GardenVariety
     #   class PostsController
     #     def show
     #       # This...
-    #       self.resource = value
+    #       self.model = value
     #       # ...is equivalent to:
     #       @post = value
     #     end
@@ -123,7 +123,7 @@ module GardenVariety
     #
     # @param value [Object]
     # @return [value]
-    def resource=(value)
+    def model=(value)
       instance_variable_set("@#{self.class.model_class.to_s.underscore.tr("/", "_")}", value)
     end
 
@@ -192,12 +192,12 @@ module GardenVariety
     # @example
     #   class PostsController < ApplicationController
     #     def show
-    #        @post = find_resource
+    #        @post = find_model
     #     end
     #   end
     #
     # @return [ActiveRecord::Base]
-    def find_resource
+    def find_model
       self.class.model_class.find(params[:id])
     end
 
@@ -208,12 +208,12 @@ module GardenVariety
     # @example
     #   class PostsController < ApplicationController
     #     def new
-    #        @post = new_resource
+    #        @post = new_model
     #     end
     #   end
     #
     # @return [ActiveRecord::Base]
-    def new_resource
+    def new_model
       self.class.model_class.new
     end
 

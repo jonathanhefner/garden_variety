@@ -48,13 +48,13 @@ PostsController.class_eval do
     super
   end
 
-  def find_resource
-    response.headers["X-Test-find_resource"] = "test"
+  def find_model
+    response.headers["X-Test-find_model"] = "test"
     super
   end
 
-  def new_resource
-    response.headers["X-Test-new_resource"] = "test"
+  def new_model
+    response.headers["X-Test-new_model"] = "test"
     super
   end
 
@@ -104,7 +104,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_show
     get post_path(AN_ID)
     assert_response :success
-    assert_used :find_resource
+    assert_used :find_model
     assert_rendered_show AN_ID
   end
 
@@ -118,7 +118,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_new
     get new_post_path
     assert_response :success
-    assert_used :new_resource
+    assert_used :new_model
     assert_rendered_new
   end
 
@@ -139,7 +139,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   def test_create
     post posts_path, params: { post: { title: "NEW!" } }
-    assert_used :new_resource
+    assert_used :new_model
     new_post = Post.order(:created_at).last
     assert_redirected_to new_post
     assert_flash_message :success
@@ -183,7 +183,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   def test_edit
     get edit_post_path(AN_ID)
     assert_response :success
-    assert_used :find_resource
+    assert_used :find_model
     assert_rendered_edit(AN_ID)
   end
 
@@ -196,7 +196,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   def test_update
     put post_path(AN_ID), params: { post: { title: "UPDATED!" } }
-    assert_used :find_resource
+    assert_used :find_model
     assert_redirected_to post_path(AN_ID)
     assert_flash_message :success
     assert_equal "UPDATED!", Post.find(AN_ID).title
@@ -238,7 +238,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
 
   def test_destroy
     delete post_path(AN_ID)
-    assert_used :find_resource
+    assert_used :find_model
     assert_redirected_to posts_path
     assert_flash_message :success
     refute Post.exists?(AN_ID)

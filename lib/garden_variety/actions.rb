@@ -15,7 +15,7 @@ module GardenVariety
     # Garden variety controller +show+ action.
     # @return [void]
     def show
-      self.resource = authorize(find_resource)
+      self.model = authorize(find_model)
     end
   end
 
@@ -24,9 +24,9 @@ module GardenVariety
     # @return [void]
     def new
       if params.key?(self.class.model_class.model_name.param_key)
-        self.resource = vest(new_resource)
+        self.model = vest(new_model)
       else
-        self.resource = authorize(new_resource)
+        self.model = authorize(new_model)
       end
     end
   end
@@ -38,10 +38,10 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def create
-      self.resource = (resource = vest(new_resource))
-      if resource.save
+      self.model = (model = vest(new_model))
+      if model.save
         flash[:success] = flash_message(:success)
-        block_given? ? yield : redirect_to(resource)
+        block_given? ? yield : redirect_to(model)
         flash.discard(:success) if REDIRECT_CODES.exclude?(response.status)
       else
         flash.now[:error] = flash_message(:error)
@@ -54,7 +54,7 @@ module GardenVariety
     # Garden variety controller +edit+ action.
     # @return [void]
     def edit
-      self.resource = authorize(find_resource)
+      self.model = authorize(find_model)
     end
   end
 
@@ -65,10 +65,10 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def update
-      self.resource = (resource = vest(find_resource))
-      if resource.save
+      self.model = (model = vest(find_model))
+      if model.save
         flash[:success] = flash_message(:success)
-        block_given? ? yield : redirect_to(resource)
+        block_given? ? yield : redirect_to(model)
         flash.discard(:success) if REDIRECT_CODES.exclude?(response.status)
       else
         flash.now[:error] = flash_message(:error)
@@ -84,8 +84,8 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def destroy
-      self.resource = (resource = authorize(find_resource))
-      if resource.destroy
+      self.model = (model = authorize(find_model))
+      if model.destroy
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(action: :index)
         flash.discard(:success) if REDIRECT_CODES.exclude?(response.status)
