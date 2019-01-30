@@ -65,6 +65,10 @@ class ControllerTest < Minitest::Test
     assert_equal "Default usage", Namespaced::DefaultUsage.model_name.human
   end
 
+  def test_garden_variety_macro_raises_on_invalid_action
+    assert_raises(ArgumentError){ NoUsagesController.garden_variety :bad }
+  end
+
   def test_model_class
     CONTROLLER_MODELS.each do |controller_class, model_class|
       assert_equal model_class, controller_class.model_class

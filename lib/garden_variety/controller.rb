@@ -50,7 +50,15 @@ module GardenVariety
       #
       # @param actions [Array<:index, :show, :new, :create, :edit, :update, :destroy>]
       # @return [void]
+      # @raise [ArgumentError]
+      #   if an invalid action is specified
       def garden_variety(*actions)
+        actions.each do |action|
+          unless ::GardenVariety::ACTION_MODULES.key?(action)
+            raise ArgumentError, "Invalid action: #{action.inspect}"
+          end
+        end
+
         action_modules = actions.empty? ?
           ::GardenVariety::ACTION_MODULES.values :
           ::GardenVariety::ACTION_MODULES.values_at(*actions)
