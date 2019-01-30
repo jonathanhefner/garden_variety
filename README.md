@@ -121,7 +121,7 @@ class PostsController < ApplicationController
   end
 
   def flash_options
-    { resource_name: "post", resource_capitalized: "Post" }
+    { model_name: "Post" }
   end
 
   def flash_message(status)
@@ -222,9 +222,8 @@ Internationalization guide for more information.)
 
 Interpolation in flash messages is also supported (as described by
 [Passing Variables to Translations]), with interpolation values provided
-by the `flash_options` method.  By default, `flash_options` provides
-`resource_name` and `resource_capitalized` values, but you can override
-it to provide your own values.
+by the `flash_options` method.  By default, `flash_options` provides a
+`model_name` value, but you can override it to provide your own values.
 
 [Safe HTML Translations]: http://guides.rubyonrails.org/i18n.html#using-safe-html-translations
 [Passing Variables to Translations]: http://guides.rubyonrails.org/i18n.html#passing-variables-to-translations

@@ -251,8 +251,8 @@ module GardenVariety
 
     # @!visibility public
     # Returns Hash of values for interpolation in flash messages via
-    # I18n.  By default, returns +resource_name+ and
-    # +resource_capitalized+ values appropriate to the controller.
+    # I18n.  By default, returns a +model_name+ key / value pair based
+    # on the controller's {Controller::ClassMethods#model_name}.
     # Override this method to provide your own values.  Be aware that
     # certain option names, such as +default+ and +scope+, are reserved
     # by the I18n gem, and can not be used for interpolation.  See the
@@ -261,8 +261,7 @@ module GardenVariety
     #
     # @return [Hash]
     def flash_options
-      { resource_name: self.class.model_name.human.downcase,
-        resource_capitalized: self.class.model_name.human }
+      { model_name: self.class.model_name.human }
     end
 
     # @!visibility public
@@ -289,12 +288,16 @@ module GardenVariety
     #   # en:
     #   #   success: "Success!"
     #   #   create:
-    #   #     success: "%{resource_capitalized} created."
+    #   #     success: "%{model_name} created."
     #   #   delete:
-    #   #     success: "%{resource_capitalized} deleted."
+    #   #     success: "%{model_name} deleted."
     #   #   posts:
     #   #     create:
     #   #       success: "Congratulations on your new post!"
+    #   #   messages:
+    #   #     drafts:
+    #   #       update:
+    #   #         success: "Draft saved."
     #
     #   # via PostsController#create
     #   flash_message(:success)  # == "Congratulations on your new post!"
@@ -304,21 +307,6 @@ module GardenVariety
     #
     #   # via PostsController#delete
     #   flash_message(:success)  # == "Post deleted."
-    #
-    # @example Namespaced controller
-    #   ### config/locales/garden_variety.en.yml
-    #   # en:
-    #   #   create:
-    #   #     success: "Created new %{resource_name}."
-    #   #   update:
-    #   #     success: "Updated %{resource_name}."
-    #   #   messages:
-    #   #     drafts:
-    #   #       update:
-    #   #         success: "Draft saved."
-    #
-    #   # via Messages::DraftsController#create
-    #   flash_message(:success)  # == "Created new draft."
     #
     #   # via Messages::DraftsController#update
     #   flash_message(:success)  # == "Draft saved."

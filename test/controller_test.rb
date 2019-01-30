@@ -136,10 +136,9 @@ class ControllerTest < Minitest::Test
 
   def test_flash_options
     CONTROLLER_MODELS.keys.each do |controller_class|
-      resource_name = controller_class.model_name.human.downcase
+      model_name = controller_class.model_name.human
       actual = controller_class.new.send(:flash_options)
-      assert_equal resource_name, actual[:resource_name]
-      assert_equal resource_name.capitalize, actual[:resource_capitalized]
+      assert_equal model_name, actual[:model_name]
     end
   end
 

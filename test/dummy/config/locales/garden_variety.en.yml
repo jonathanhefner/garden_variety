@@ -1,10 +1,10 @@
 en:
   create:
-    success: '%{resource_capitalized} was successfully created.'
-    error: 'Could not create %{resource_name}.'
+    success: '%{model_name} was successfully created.'
+    error: '%{model_name} could not be created.'
   update:
-    success: '%{resource_capitalized} was successfully updated.'
-    error: 'Could not update %{resource_name}.'
+    success: '%{model_name} was successfully updated.'
+    error: '%{model_name} could not be updated.'
   destroy:
-    success: '%{resource_capitalized} was successfully destroyed.'
-    error: 'Could not destroy %{resource_name}.'
+    success: '%{model_name} was successfully destroyed.'
+    error: '%{model_name} could not be destroyed.'
