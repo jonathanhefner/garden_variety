@@ -126,12 +126,12 @@ class PostsController < ApplicationController
 
   def flash_message(status)
     keys = [
-      :"posts.#{action_name}.#{status}",
-      :"posts.#{action_name}.#{status}_html",
-      :"#{action_name}.#{status}",
-      :"#{action_name}.#{status}_html",
-      :"#{status}",
-      :"#{status}_html",
+      :"flash.posts.#{action_name}.#{status}",
+      :"flash.posts.#{action_name}.#{status}_html",
+      :"flash.#{action_name}.#{status}",
+      :"flash.#{action_name}.#{status}_html",
+      :"flash.#{status}",
+      :"flash.#{status}_html",
     ]
     helpers.translate(keys.first, default: keys.drop(1), **flash_options)
   end

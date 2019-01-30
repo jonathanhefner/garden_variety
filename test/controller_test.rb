@@ -200,7 +200,7 @@ class ControllerTest < Minitest::Test
 
   def store_translation(key, value)
     normalized = key.split(".").reverse.reduce(value){|acc, scope| { scope.to_sym => acc } }
-    I18n.backend.store_translations(:en, normalized)
+    I18n.backend.store_translations(:en, flash: normalized)
   end
 
 end

@@ -316,12 +316,12 @@ module GardenVariety
     def flash_message(status)
       controller_key = controller_path.tr("/", I18n.default_separator)
       keys = [
-        :"#{controller_key}.#{action_name}.#{status}",
-        :"#{controller_key}.#{action_name}.#{status}_html",
-        :"#{action_name}.#{status}",
-        :"#{action_name}.#{status}_html",
-        :"#{status}",
-        :"#{status}_html",
+        :"flash.#{controller_key}.#{action_name}.#{status}",
+        :"flash.#{controller_key}.#{action_name}.#{status}_html",
+        :"flash.#{action_name}.#{status}",
+        :"flash.#{action_name}.#{status}_html",
+        :"flash.#{status}",
+        :"flash.#{status}_html",
       ]
       helpers.translate(keys.shift, default: keys, **flash_options)
     end

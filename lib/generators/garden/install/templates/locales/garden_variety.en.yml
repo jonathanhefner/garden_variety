@@ -1,10 +1,11 @@
 en:
-  create:
-    success: '%{model_name} was successfully created.'
-    error: '%{model_name} could not be created.'
-  update:
-    success: '%{model_name} was successfully updated.'
-    error: '%{model_name} could not be updated.'
-  destroy:
-    success: '%{model_name} was successfully destroyed.'
-    error: '%{model_name} could not be destroyed.'
+  flash:
+    create:
+      success: '%{model_name} was successfully created.'
+      error: '%{model_name} could not be created.'
+    update:
+      success: '%{model_name} was successfully updated.'
+      error: '%{model_name} could not be updated.'
+    destroy:
+      success: '%{model_name} was successfully destroyed.'
+      error: '%{model_name} could not be destroyed.'
