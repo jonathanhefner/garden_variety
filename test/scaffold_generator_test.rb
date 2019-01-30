@@ -18,7 +18,7 @@ class ScaffoldGeneratorTest < Rails::Generators::TestCase
 
   teardown :prepare_destination # prevent generated *_test.rb files from confusing `rake test`
 
-  LOCALES_FILE = "config/locales/garden_variety.en.yml"
+  LOCALES_FILE = "config/locales/flash.en.yml"
 
   def test_generates_scaffold_files_and_missing_locales
     File.delete(File.join(__dir__, "tmp", LOCALES_FILE))

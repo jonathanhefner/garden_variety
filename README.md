@@ -207,9 +207,9 @@ generator in a few small ways:
 
 Flash messages are defined using I18n.  The *garden_variety* installer
 (`rails generate garden:install`) will create a
-"config/locales/garden_variety.en.yml" file containing default "success"
-and "error" messages.  You can edit this file to customize those
-messages, or add your own translation files to support other languages.
+"config/locales/flash.en.yml" file containing default "success" and
+"error" messages.  You can edit this file to customize those messages,
+or add your own translation files to support other languages.
 
 As seen in the `PostsController#flash_message` method in the example
 above, a prioritized list of keys are tried when retrieving a flash

@@ -20,7 +20,7 @@ class InstallGeneratorTest < Rails::Generators::TestCase
 
   def test_generates_installation_files
     run_generator
-    assert_file "config/locales/garden_variety.en.yml"
+    assert_file "config/locales/flash.en.yml"
     assert_file PUNDIT_POLICY_PATH
   end
 
