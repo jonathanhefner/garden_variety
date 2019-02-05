@@ -1,27 +1,15 @@
-require "fileutils"
-require "timeout"
 require "test_helper"
+require_relative "generator_test_case"
 require "generators/garden/scaffold/scaffold_generator"
 
-class ScaffoldGeneratorTest < Rails::Generators::TestCase
+class ScaffoldGeneratorTest < GeneratorTestCase
   tests Garden::Generators::ScaffoldGenerator
-  destination File.join(__dir__, "tmp")
-
-  setup do
-    prepare_destination
-
-    Dir.chdir(__dir__) do
-      FileUtils.copy_entry("dummy/bin", "tmp/bin")
-      FileUtils.copy_entry("dummy/config", "tmp/config")
-    end
-  end
-
-  teardown :prepare_destination # prevent generated *_test.rb files from confusing `rake test`
 
   LOCALES_FILE = "config/locales/flash.en.yml"
 
   def test_generates_scaffold_files_and_missing_locales
-    File.delete(File.join(__dir__, "tmp", LOCALES_FILE))
+    File.delete(File.join(destination_root, LOCALES_FILE))
+
     generate_scaffold("fruit")
     assert_file LOCALES_FILE
     assert_scaffold("fruit")
@@ -29,13 +17,10 @@ class ScaffoldGeneratorTest < Rails::Generators::TestCase
 
   def test_generates_namespaced_scaffold_files_and_skips_conflicting_locales
     # ensure locales file contents will conflict with default locales file
-    File.write(File.join(__dir__, "tmp", LOCALES_FILE), "EXPECTED")
+    File.write(File.join(destination_root, LOCALES_FILE), "EXPECTED")
 
-    # generator will wait for keyboard input if the skip-on-conflict
-    # option for copy locales is erroneously omitted
-    Timeout.timeout(15){ generate_scaffold("spaced/vegetable") }
-
-    assert_file LOCALES_FILE, /EXPECTED/
+    generate_scaffold("spaced/vegetable")
+    assert_file LOCALES_FILE, "EXPECTED"
     assert_scaffold("spaced/vegetable")
   end
 
