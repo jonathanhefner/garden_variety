@@ -52,6 +52,8 @@ class ScaffoldGeneratorTest < GeneratorTestCase
     assert_file "app/controllers/#{resource.pluralize}_controller.rb", /^\s+garden_variety$/
 
     assert_file "app/policies/#{resource}_policy.rb"
+
+    assert_no_directory "app/searches"
   end
 
 end

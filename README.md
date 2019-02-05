@@ -202,6 +202,13 @@ generator in a few small ways:
 * No jbuilder templates.  Only HTML templates are generated.
 * `rails generate pundit:policy` is invoked for the specified model.
 
+Additionally, if you are using the [talent_scout](https://rubygems.org/gems/talent_scout)
+gem, the scaffold generator will invoke `rails generate talent_scout:search`
+for the specified model.  This behavior can be disabled with the
+`--skip-talent-scout` option.  For more information about integrating
+with *talent_scout*, see the [Searching with talent_scout](#searching-with-talent_scout)
+section below.
+
 
 ## Flash messages
 
@@ -264,6 +271,47 @@ class PostsController < ApplicationController
   def find_collection
     params[:author] ? super.where(author: params[:author]) : super
   end
+end
+```
+
+#### Searching with talent_scout
+
+If you are using the [talent_scout](https://rubygems.org/gems/talent_scout)
+gem, `find_collection` will automatically instantiate your model search
+class without requiring an override.  For example, if a `PostSearch`
+class is defined, `PostsController#find_collection` will be equivalent
+to:
+
+```ruby
+def find_collection
+  @search = PostSearch.new(params[:q])
+  @search.results
+end
+```
+
+Notice, as a side effect, the `@search` variable is set for later use in
+the view.  The model search class will be chosen based on the
+controller's `::model_class`.  For example:
+
+```ruby
+class MyPostsController < ApplicationController
+  garden_variety
+
+  self.model_class = Post # find_collection will use PostSearch instead of MyPostSearch
+end
+```
+
+If a corresponding model search class is not defined, `find_collection`
+will fall back to its original non-search behavior.
+
+Alternatively, you can override the model search class directly:
+
+```ruby
+class MyPostsController < ApplicationController
+  garden_variety
+
+  self.model_class = Post
+  self.model_search_class = MyPostSearch # find_collection will use MyPostSearch
 end
 ```
 

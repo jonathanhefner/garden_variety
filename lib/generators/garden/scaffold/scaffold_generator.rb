@@ -11,6 +11,9 @@ module Garden
       # inherited from Rails::Generators::Base
       class_option :template_engine
 
+      class_option :talent_scout, type: :boolean, default: true,
+        description: "Invoke talent_scout:search generator"
+
       # override +initialize+ because it is the only way to reliably
       # capture the raw input arguments in order to pass them on to
       # `rails generate resource` (Thor neglects to provide an accessor,
@@ -37,6 +40,12 @@ module Garden
 
       def generate_pundit_policy
         generate("pundit:policy", resource)
+      end
+
+      def generate_talent_scout_search
+        if defined?(::TalentScout) && options.talent_scout?
+          generate("talent_scout:search", resource)
+        end
       end
     end
   end
