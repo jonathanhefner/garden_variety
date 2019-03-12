@@ -7,11 +7,10 @@ robustness (less custom code == less that can go wrong).  In service of
 this principle, *garden_variety* provides reasonable default controller
 actions, with care to allow easy override.
 
-*garden_variety* also uses the excellent
-[Pundit](https://rubygems.org/gems/pundit) gem to isolate authorization
-concerns.  If you're unfamiliar with Pundit, see its documentation for
-an explanation of policy objects and how they help controller actions
-stay DRY and boring.
+*garden_variety* also relies on the [Pundit](https://rubygems.org/gems/pundit)
+gem to isolate authorization concerns.  If you're unfamiliar with
+Pundit, see its documentation for an explanation of policy objects and
+how they help controller actions stay DRY and boring.
 
 As an example, this controller using `garden_variety`...
 
@@ -142,7 +141,7 @@ controller name, by default.  That value can be overridden using the
 matching `::model_class=` setter.  The `model` / `collection` accessor
 methods are dictated by `::model_class`.  The rest of the methods can be
 overridden as normal, a la carte.  For a detailed description of method
-behavior, see the [full documentation](http://www.rubydoc.info/gems/garden_variety/).
+behavior, see the [API documentation](http://www.rubydoc.info/gems/garden_variety/).
 (Note that the `authorize`, `policy_scope`, and `permitted_attributes`
 methods are provided by Pundit.)
 
@@ -200,21 +199,23 @@ generator in a few small ways:
 * No jbuilder templates.  Only HTML templates are generated.
 * `rails generate pundit:policy` is invoked for the specified model.
 
-Additionally, if you are using the [talent_scout](https://rubygems.org/gems/talent_scout)
-gem, the scaffold generator will invoke `rails generate talent_scout:search`
-for the specified model.  This behavior can be disabled with the
-`--skip-talent-scout` option.  For more information about integrating
-with *talent_scout*, see the [Searching with talent_scout](#searching-with-talent_scout)
-section below.
+Additionally, if you are using the [talent_scout] gem, the scaffold
+generator will invoke `rails generate talent_scout:search` for the
+specified model.  This behavior can be disabled with the `--skip-talent-scout`
+option.  For more information about integrating with *talent_scout*, see
+the [Searching with talent_scout](#searching-with-talent_scout) section
+below.
+
+[talent_scout]: https://rubygems.org/gems/talent_scout
 
 
 ## Flash messages
 
 Flash messages are defined using I18n.  The *garden_variety* installer
-(`rails generate garden:install`) will create a
-"config/locales/flash.en.yml" file containing default "success" and
-"error" messages.  You can edit this file to customize those messages,
-or add your own translation files to support other languages.
+(`rails generate garden:install`) will create a "config/locales/flash.en.yml"
+file containing default "success" and "error" messages.  You can edit
+this file to customize those messages, or add your own translation files
+to support other languages.
 
 As seen in the `PostsController#flash_message` method in the example
 above, a prioritized list of keys are tried when retrieving a flash
@@ -240,10 +241,10 @@ by the `flash_options` method.  By default, `flash_options` provides a
 written, including in situations where custom code is unavoidable.
 
 
-### Integrating with pagination
+### Pagination
 
 You can integrate your your favorite pagination gem (*may I suggest
-[foliate](https://rubygems.org/gems/foliate)?*) by overriding the
+[moar](https://rubygems.org/gems/moar)?*) by overriding the
 `find_collection` method:
 
 ```ruby
@@ -251,34 +252,33 @@ class PostsController < ApplicationController
   garden_variety
 
   def find_collection
-    paginate(super)
+    moar(super.order(:created_at))
   end
 end
 ```
 
 
-### Integrating with search
+### Searching
 
-You can also integrate search functionality by overriding the
-`find_collection` method:
+You can provide search functionality by overriding the `find_collection`
+method:
 
 ```ruby
 class PostsController < ApplicationController
   garden_variety
 
   def find_collection
-    params[:author] ? super.where(author: params[:author]) : super
+    params[:title] ? super.where("title LIKE ?", "%#{params[:title]}%") : super
   end
 end
 ```
 
 #### Searching with talent_scout
 
-If you are using the [talent_scout](https://rubygems.org/gems/talent_scout)
-gem, `find_collection` will automatically instantiate your model search
-class without requiring an override.  For example, if a `PostSearch`
-class is defined, `PostsController#find_collection` will be equivalent
-to:
+If you are using the [talent_scout] gem, the default implementation of
+`find_collection` will automatically instantiate your model search class
+-- no override required.  For example, if a `PostSearch` class is
+defined, `PostsController#find_collection` will be equivalent to:
 
 ```ruby
 def find_collection
@@ -314,13 +314,12 @@ end
 ```
 
 
-### Integrating with SJR
+### Server-generated JavaScript Responses (SJR)
 
-Server-generated JavaScript Response (SJR) controller actions are
-generally the same as conventional controller actions, with one
-difference: non-GET SJR actions render instead of redirect on success.
-*garden_variety* provides a concise syntax for overriding only
-on-success behavior of non-GET actions:
+SJR controller actions are generally the same as conventional controller
+actions, with one difference: non-GET SJR actions render instead of
+redirect on success.  *garden_variety* provides a concise syntax for
+overriding only the on-success behavior of non-GET actions:
 
 ```ruby
 class PostsController < ApplicationController
@@ -364,7 +363,7 @@ messages.  If a redirect is replaced with a render, the flash message
 will be set such that it does not affect the next request.
 
 
-### Integrating with authentication
+### Authentication
 
 The details of integrating authentication will depend on your chosen
 authentication library.  [Devise](https://rubygems.org/gems/devise) is
@@ -400,7 +399,7 @@ this conflict, add the following line to your Clearance initializer:
 ```
 
 
-### Integrating with Form Objects
+### Form Objects
 
 The Form Object pattern is used to mitigate the complexity of handling
 forms which need special processing logic, such as context-dependent
@@ -485,7 +484,7 @@ Notice the call to `::model_class=`.  The model class for
 `PublishedPost`.  And because of this override, the `@posts` instance
 variable will be used instead of `@published_posts`.
 
-This example may be somewhat contrived, but there is an excellent talk
+This example may be somewhat contrived, but here is an excellent talk
 from RailsConf which delves deeper into the principle:
 [In Relentless Pursuit of REST](https://www.youtube.com/watch?v=HctYHe-YjnE)
 ([slides](https://speakerdeck.com/derekprior/in-relentless-pursuit-of-rest)).
@@ -505,7 +504,7 @@ Then execute:
 $ bundle install
 ```
 
-And finally, run the *garden_variety* install generator:
+And finally, run the install generator:
 
 ```bash
 $ rails generate garden:install
