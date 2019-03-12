@@ -23,11 +23,8 @@ module GardenVariety
     # Garden variety controller +new+ action.
     # @return [void]
     def new
-      if params.key?(self.class.model_name.param_key)
-        self.model = vest(new_model)
-      else
-        self.model = authorize(new_model)
-      end
+      self.model = (model = authorize(new_model))
+      assign_attributes(model) if params.key?(self.class.model_name.param_key)
     end
   end
 
@@ -38,7 +35,7 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def create
-      self.model = (model = vest(new_model))
+      self.model = (model = assign_attributes(authorize(new_model)))
       if model.save
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(model)
@@ -65,7 +62,7 @@ module GardenVariety
     #   @yield on-success callback, replaces default redirect
     # @return [void]
     def update
-      self.model = (model = vest(find_model))
+      self.model = (model = assign_attributes(authorize(find_model)))
       if model.save
         flash[:success] = flash_message(:success)
         block_given? ? yield : redirect_to(model)

@@ -36,15 +36,14 @@ class PostsController < ApplicationController
   end
 
   def new
+    self.model = authorize(new_model)
     if params.key?(self.class.model_class.model_name.param_key)
-      self.model = vest(new_model)
-    else
-      self.model = authorize(new_model)
+      assign_attributes(model)
     end
   end
 
   def create
-    self.model = vest(new_model)
+    self.model = assign_attributes(authorize(new_model))
     if model.save
       flash[:success] = flash_message(:success)
       redirect_to model
@@ -59,7 +58,7 @@ class PostsController < ApplicationController
   end
 
   def update
-    self.model = vest(find_model)
+    self.model = assign_attributes(authorize(find_model))
     if model.save
       flash[:success] = flash_message(:success)
       redirect_to model
@@ -114,8 +113,7 @@ class PostsController < ApplicationController
     self.class.model_class.new
   end
 
-  def vest(model)
-    authorize(model)
+  def assign_attributes(model)
     model.assign_attributes(permitted_attributes(model))
     model
   end

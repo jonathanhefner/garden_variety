@@ -232,15 +232,14 @@ module GardenVariety
     end
 
     # @!visibility public
-    # Authorizes the given model for the current action via the model
-    # Pundit policy, and populates the model attributes with the current
-    # request params permitted by the model policy.  Returns the given
+    # Populates the given model's attributes with the current request
+    # params permitted by the model's Pundit policy.  Returns the given
     # model modified but not persisted.
     #
     # @example
     #   class PostsController < ApplicationController
     #     def create
-    #       @post = vest(Post.new)
+    #       @post = assign_attributes(authorize(Post.new))
     #       if @post.save
     #         redirect_to @post
     #       else
@@ -251,8 +250,7 @@ module GardenVariety
     #
     # @param model [ActiveRecord::Base]
     # @return [ActiveRecord::Base]
-    def vest(model)
-      authorize(model)
+    def assign_attributes(model)
       model.assign_attributes(permitted_attributes(model))
       model
     end
