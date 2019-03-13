@@ -241,6 +241,24 @@ by the `flash_options` method.  By default, `flash_options` provides a
 written, including in situations where custom code is unavoidable.
 
 
+### Eliminating N+1 queries
+
+With proper Russian doll caching, [N+1 queries can be a feature](
+https://youtu.be/ktZLpjCanvg?t=4m27s).  But, if you need to eliminate
+an N+1 query by using eager loading, you can override the
+`find_collection` method:
+
+```ruby
+class PostsController < ApplicationController
+  garden_variety
+
+  def find_collection
+    super.includes(:author)
+  end
+end
+```
+
+
 ### Pagination
 
 You can integrate your your favorite pagination gem (*may I suggest
