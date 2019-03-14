@@ -130,7 +130,7 @@ class PostsController < ApplicationController
       :"flash.#{status}",
       :"flash.#{status}_html",
     ]
-    helpers.translate(keys.first, default: keys.drop(1), **flash_options)
+    helpers.translate(keys.first, { default: keys.drop(1), **flash_options })
   end
 
 end
