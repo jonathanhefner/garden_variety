@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "garden_variety"
   s.version     = GardenVariety::VERSION
   s.authors     = ["Jonathan Hefner"]
-  s.email       = ["jonathan.hefner@gmail.com"]
+  s.email       = ["jonathan@hefner.pro"]
   s.homepage    = "https://github.com/jonathanhefner/garden_variety"
   s.summary     = %q{Delightfully boring Rails controllers}
   s.license     = "MIT"
