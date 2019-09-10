@@ -317,7 +317,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   end
 
   def assert_rendered_sjr(action)
-    assert_includes %w[text/javascript application/javascript], response.content_type
+    assert_includes %w[text/javascript application/javascript], response.media_type
     assert_match "alert(\"#{action}\")", response.body
   end
 
