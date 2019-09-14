@@ -1,3 +1,4 @@
+return if Bundler.load.dependencies.none?{|dep| dep.name == "talent_scout" }
 require "test_helper"
 
 class TalentScoutTest < Minitest::Test

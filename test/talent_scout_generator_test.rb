@@ -1,3 +1,4 @@
+return if Bundler.load.dependencies.none?{|dep| dep.name == "talent_scout" }
 require "test_helper"
 require_relative "generator_test_case"
 require "generators/garden/scaffold/scaffold_generator"
