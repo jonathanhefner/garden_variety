@@ -66,14 +66,14 @@ end
 
 class IntegrationTest < ActionDispatch::IntegrationTest
 
-  AN_ID = Post.pluck(:id).first
-
   setup do
     Rails.application.config.action_dispatch.show_exceptions = false
 
     PostPolicy.allow_all = true
     PostPolicy.permitted_attributes = [:title]
     PostPolicy::Scope.allow_ids = nil
+
+    @post_id = Post.pluck(:id).first
   end
 
   def test_index
@@ -86,10 +86,10 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   end
 
   def test_index_scoped
-    PostPolicy::Scope.allow_ids = Post.pluck(:id) - [AN_ID]
+    PostPolicy::Scope.allow_ids = Post.pluck(:id) - [@post_id]
     get posts_path
     assert_response :success
-    assert_select "a[href=?]", post_path(AN_ID), count: 0
+    assert_select "a[href=?]", post_path(@post_id), count: 0
   end
 
   def test_index_forbidden
@@ -100,16 +100,16 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   end
 
   def test_show
-    get post_path(AN_ID)
+    get post_path(@post_id)
     assert_response :success
     assert_used :find_model
-    assert_rendered_show AN_ID
+    assert_rendered_show @post_id
   end
 
   def test_show_forbidden
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
-      get post_path(AN_ID)
+      get post_path(@post_id)
     end
   end
 
@@ -179,108 +179,108 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   end
 
   def test_edit
-    get edit_post_path(AN_ID)
+    get edit_post_path(@post_id)
     assert_response :success
     assert_used :find_model
-    assert_rendered_edit(AN_ID)
+    assert_rendered_edit(@post_id)
   end
 
   def test_edit_forbidden
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
-      get edit_post_path(AN_ID)
+      get edit_post_path(@post_id)
     end
   end
 
   def test_update
-    put post_path(AN_ID), params: { post: { title: "UPDATED!" } }
+    put post_path(@post_id), params: { post: { title: "UPDATED!" } }
     assert_used :find_model
-    assert_redirected_to post_path(AN_ID)
+    assert_redirected_to post_path(@post_id)
     assert_flash_message :success
-    assert_equal "UPDATED!", Post.find(AN_ID).title
+    assert_equal "UPDATED!", Post.find(@post_id).title
   end
 
   def test_update_with_custom_redirect
     expected_path = "/?test"
-    put post_path(AN_ID), params: { post: { title: "UPDATED!" } },
+    put post_path(@post_id), params: { post: { title: "UPDATED!" } },
       headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
     assert_flash_message :success
-    assert_equal "UPDATED!", Post.find(AN_ID).title
+    assert_equal "UPDATED!", Post.find(@post_id).title
   end
 
   def test_update_with_sjr
-    put "#{post_path(AN_ID)}.js", params: { post: { title: "SJR!" } },
+    put "#{post_path(@post_id)}.js", params: { post: { title: "SJR!" } },
       headers: { "X-Test-render_default" => true }
     assert_response :success
     assert_flash_message :success, now: true
     assert_rendered_sjr :update
-    assert_equal "SJR!", Post.find(AN_ID).title
+    assert_equal "SJR!", Post.find(@post_id).title
   end
 
   def test_update_validation_fails
-    put post_path(AN_ID), params: { post: { title: "BAD!" } }
+    put post_path(@post_id), params: { post: { title: "BAD!" } }
     assert_response :success
-    assert_rendered_edit(AN_ID)
+    assert_rendered_edit(@post_id)
     assert_flash_message :error, now: true
-    refute_equal "BAD!", Post.find(AN_ID).title
+    refute_equal "BAD!", Post.find(@post_id).title
   end
 
   def test_update_forbidden
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
-      put post_path(AN_ID), params: { post: { title: "UPDATED!" } }
+      put post_path(@post_id), params: { post: { title: "UPDATED!" } }
     end
-    refute_equal "UPDATED!", Post.find(AN_ID).title
+    refute_equal "UPDATED!", Post.find(@post_id).title
   end
 
   def test_destroy
-    delete post_path(AN_ID)
+    delete post_path(@post_id)
     assert_used :find_model
     assert_redirected_to posts_path
     assert_flash_message :success
-    refute Post.exists?(AN_ID)
+    refute Post.exists?(@post_id)
   end
 
   def test_destroy_with_custom_redirect
     expected_path = "/?test"
-    delete post_path(AN_ID), headers: { "X-Test-redirect_to" => expected_path }
+    delete post_path(@post_id), headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
     assert_flash_message :success
-    refute Post.exists?(AN_ID)
+    refute Post.exists?(@post_id)
   end
 
   def test_destroy_with_sjr
-    delete "#{post_path(AN_ID)}.js", headers: { "X-Test-render_default" => true }
+    delete "#{post_path(@post_id)}.js", headers: { "X-Test-render_default" => true }
     assert_response :success
     assert_flash_message :success, now: true
     assert_rendered_sjr :destroy
-    refute Post.exists?(AN_ID)
+    refute Post.exists?(@post_id)
   end
 
   def test_destroy_fails
-    Post.find(AN_ID).update(title: "PERMANENT!")
-    delete post_path(AN_ID)
+    Post.find(@post_id).update(title: "PERMANENT!")
+    delete post_path(@post_id)
     assert_response :success
-    assert_rendered_show(AN_ID)
+    assert_rendered_show(@post_id)
     assert_flash_message :error, now: true
-    assert Post.exists?(AN_ID)
+    assert Post.exists?(@post_id)
   end
 
   def test_destroy_forbidden
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
-      delete post_path(AN_ID)
+      delete post_path(@post_id)
     end
-    assert Post.exists?(AN_ID)
+    assert Post.exists?(@post_id)
   end
 
   def test_strong_params
     PostPolicy.permitted_attributes = []
-    put post_path(AN_ID), params: { post: { title: "UNPERMITTED!" } }
+    put post_path(@post_id), params: { post: { title: "UNPERMITTED!" } }
     follow_redirect!
     assert_response :success
-    refute_equal "UNPERMITTED!", Post.find(AN_ID).title
+    refute_equal "UNPERMITTED!", Post.find(@post_id).title
   end
 
   private
