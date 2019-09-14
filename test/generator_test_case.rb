@@ -7,6 +7,9 @@ require "test_helper"
 # lose performance due to disk thrashing.
 class GeneratorTestCase < Rails::Generators::TestCase
   include ActiveSupport::Testing::Isolation
+  # HACK skip fixtures (which aren't necessary for generator tests),
+  # else tests parallelized with Rails 5.1 cause SQLite3::BusyException
+  self.fixture_table_names = []
 
   def setup
     self.class.destination File.join(__dir__, "tmp", Process.pid.to_s)

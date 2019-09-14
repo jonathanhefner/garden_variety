@@ -66,8 +66,6 @@ end
 
 class IntegrationTest < ActionDispatch::IntegrationTest
 
-  fixtures :posts
-
   AN_ID = Post.pluck(:id).first
 
   setup do
