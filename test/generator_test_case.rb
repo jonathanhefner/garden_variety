@@ -12,12 +12,15 @@ class GeneratorTestCase < Rails::Generators::TestCase
   self.fixture_table_names = []
 
   def setup
-    self.class.destination File.join(__dir__, "tmp", Process.pid.to_s)
+    tmp = "tmp/#{Process.pid}"
+    self.class.destination File.join(__dir__, tmp)
     prepare_destination
 
     Dir.chdir(__dir__) do
-      FileUtils.copy_entry("dummy/bin", "tmp/#{Process.pid}/bin")
-      FileUtils.copy_entry("dummy/config", "tmp/#{Process.pid}/config")
+      FileUtils.copy_entry("dummy/bin", "#{tmp}/bin")
+      FileUtils.copy_entry("dummy/config", "#{tmp}/config")
+      FileUtils.mkdir_p("#{tmp}/app/assets/config")
+      FileUtils.touch("#{tmp}/app/assets/config/manifest.js")
     end
   end
 
