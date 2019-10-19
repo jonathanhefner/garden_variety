@@ -1,7 +1,11 @@
+require "generators/garden/optimized_generate_action"
+
 # @!visibility private
 module Garden
   module Generators
     class ScaffoldGenerator < Rails::Generators::Base
+      include OptimizedGenerateAction
+
       source_root File.join(__dir__, "templates")
 
       argument :resource, type: :string

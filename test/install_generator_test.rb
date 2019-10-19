@@ -1,4 +1,3 @@
-require "fileutils"
 require "test_helper"
 require_relative "generator_test_case"
 require "generators/garden/install/install_generator"
@@ -6,20 +5,21 @@ require "generators/garden/install/install_generator"
 class InstallGeneratorTest < GeneratorTestCase
   tests Garden::Generators::InstallGenerator
 
-  LOCALES_FILE = "config/locales/flash.en.yml"
-  PUNDIT_FILE = "app/policies/application_policy.rb"
-
-  def test_generates_installation_files
+  def test_generates_locales
     run_generator
-    assert_file LOCALES_FILE
-    assert_file PUNDIT_FILE
+    assert_file "config/locales/flash.en.yml"
   end
 
-  def test_skips_pundit_files_if_already_installed
-    FileUtils.mkdir_p(File.dirname(File.join(destination_root, PUNDIT_FILE)))
-    File.write(File.join(destination_root, PUNDIT_FILE), "EXPECTED")
+  def test_generates_pundit_application_policy_if_missing
+    policy_file = "app/policies/application_policy.rb"
+    assert_no_file policy_file # sanity check
 
     run_generator
-    assert_file PUNDIT_FILE, "EXPECTED"
+    assert_file policy_file
+
+    File.write(File.join(destination_root, policy_file), "EXPECTED")
+
+    run_generator
+    assert_file policy_file, "EXPECTED"
   end
 end

@@ -5,23 +5,32 @@ require "generators/garden/scaffold/scaffold_generator"
 class ScaffoldGeneratorTest < GeneratorTestCase
   tests Garden::Generators::ScaffoldGenerator
 
-  LOCALES_FILE = "config/locales/flash.en.yml"
+  def setup
+    super
+    prepare_routes
+  end
 
-  def test_generates_scaffold_files_and_missing_locales
-    File.delete(File.join(destination_root, LOCALES_FILE))
-
+  def test_generates_scaffold
     generate_scaffold("fruit")
-    assert_file LOCALES_FILE
     assert_scaffold("fruit")
   end
 
-  def test_generates_namespaced_scaffold_files_and_skips_conflicting_locales
-    # ensure locales file contents will conflict with default locales file
-    File.write(File.join(destination_root, LOCALES_FILE), "EXPECTED")
-
+  def test_generates_namespaced_scaffold
     generate_scaffold("spaced/vegetable")
-    assert_file LOCALES_FILE, "EXPECTED"
     assert_scaffold("spaced/vegetable")
+  end
+
+  def test_generates_locales_if_missing
+    locales_file = "config/locales/flash.en.yml"
+    assert_no_file locales_file # sanity check
+
+    generate_scaffold("foo")
+    assert_file locales_file
+
+    File.write(File.join(destination_root, locales_file), "EXPECTED")
+
+    generate_scaffold("bar")
+    assert_file locales_file, "EXPECTED"
   end
 
   private

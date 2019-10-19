@@ -4,12 +4,16 @@ require_relative "generator_test_case"
 require "generators/garden/scaffold/scaffold_generator"
 
 class TalentScoutGeneratorTest < GeneratorTestCase
+  include ActiveSupport::Testing::Isolation
   tests Garden::Generators::ScaffoldGenerator
 
   def setup
     Bundler.load.setup(:default, :talent_scout)
     assert require "talent_scout"
+
+    self.class.destination "#{destination_root}/#{Process.pid}"
     super
+    prepare_routes
   end
 
   def test_generates_talent_scout_search

@@ -2,33 +2,19 @@ require "fileutils"
 require "timeout"
 require "test_helper"
 
-# NOTE: Performance gains from parallelization are limited to ~2 tests
-# per GeneratorTestCase (possibly more on an SSD).  More tests than that
-# lose performance due to disk thrashing.
 class GeneratorTestCase < Rails::Generators::TestCase
-  include ActiveSupport::Testing::Isolation
-  # HACK skip fixtures (which aren't necessary for generator tests),
-  # else tests parallelized with Rails 5.1 cause SQLite3::BusyException
-  self.fixture_table_names = []
+  destination "#{__dir__}/tmp"
 
   def setup
-    tmp = "tmp/#{Process.pid}"
-    self.class.destination File.join(__dir__, tmp)
     prepare_destination
-
-    Dir.chdir(__dir__) do
-      FileUtils.copy_entry("dummy/bin", "#{tmp}/bin")
-      FileUtils.copy_entry("dummy/config", "#{tmp}/config")
-      FileUtils.mkdir_p("#{tmp}/app/assets/config")
-      FileUtils.touch("#{tmp}/app/assets/config/manifest.js")
-    end
-  end
-
-  def teardown
-    rm_rf(destination_root)
   end
 
   private
+
+  def prepare_routes
+    FileUtils.mkdir_p("#{destination_root}/config")
+    FileUtils.cp("#{__dir__}/dummy/config/routes.rb", "#{destination_root}/config/routes.rb")
+  end
 
   def run_generator(*args)
     # Several generator tests test behavior on file conflict.  By
