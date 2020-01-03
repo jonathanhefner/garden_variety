@@ -60,7 +60,7 @@ class TalentScoutTest < Minitest::Test
   private
 
   class MyModel
-    cattr_accessor(:all){ "OK" }
+    cattr_accessor(:all){ self.new }
   end
 
   class MyModelsController < ActionController::Base
@@ -71,7 +71,7 @@ class TalentScoutTest < Minitest::Test
   end
 
   class Unsearchable
-    cattr_accessor(:all){ "OK" }
+    cattr_accessor(:all){ self.new }
   end
 
   class UnsearchablesController < ActionController::Base
