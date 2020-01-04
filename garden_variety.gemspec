@@ -1,21 +1,20 @@
-$:.push File.expand_path("../lib", __FILE__)
+require_relative "lib/garden_variety/version"
 
-require "garden_variety/version"
+Gem::Specification.new do |spec|
+  spec.name        = "garden_variety"
+  spec.version     = GardenVariety::VERSION
+  spec.authors     = ["Jonathan Hefner"]
+  spec.email       = ["jonathan@hefner.pro"]
+  spec.homepage    = "https://github.com/jonathanhefner/garden_variety"
+  spec.summary     = %q{Delightfully boring Rails controllers}
+  spec.license     = "MIT"
 
-Gem::Specification.new do |s|
-  s.name        = "garden_variety"
-  s.version     = GardenVariety::VERSION
-  s.authors     = ["Jonathan Hefner"]
-  s.email       = ["jonathan@hefner.pro"]
-  s.homepage    = "https://github.com/jonathanhefner/garden_variety"
-  s.summary     = %q{Delightfully boring Rails controllers}
-  s.license     = "MIT"
+  spec.metadata["homepage_uri"] = spec.homepage
+  spec.metadata["source_code_uri"] = spec.homepage
+  spec.metadata["changelog_uri"] = spec.metadata["source_code_uri"] + "/blob/master/CHANGELOG.md"
 
-  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  s.add_dependency "rails", ">= 5.1"
-  s.add_dependency "pundit", "~> 2.0"
-
-  s.add_development_dependency "sqlite3"
-  s.add_development_dependency "talent_scout" # see Gemfile for version
+  spec.add_dependency "rails", ">= 5.1"
+  spec.add_dependency "pundit", "~> 2.0"
 end
