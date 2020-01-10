@@ -2,7 +2,7 @@
 
 Delightfully boring Rails controllers.  One of the superb advantages of
 Ruby on Rails is convention over configuration.  Opinionated default
-behavior can decrease development time, and increase application
+behavior can decrease development time and increase application
 robustness (less custom code == less that can go wrong).  In service of
 this principle, *garden_variety* provides reasonable default controller
 actions, with care to allow easy override.
@@ -139,17 +139,18 @@ end
 The `::model_class` method returns a class corresponding to the
 controller name, by default.  That value can be overridden using the
 matching `::model_class=` setter.  The `model` / `collection` accessor
-methods are dictated by `::model_class`.  The rest of the methods can be
-overridden as normal, a la carte.  For a detailed description of method
-behavior, see the [API documentation](http://www.rubydoc.info/gems/garden_variety/).
-(Note that the `authorize`, `policy_scope`, and `permitted_attributes`
-methods are provided by Pundit.)
+method definitions are dictated by `::model_class`.  The rest of the
+methods can be overridden as normal, a la carte.  For a detailed
+description of method behavior, see the [API documentation](
+https://www.rubydoc.info/gems/garden_variety/).  (Note that the
+`authorize`, `policy_scope`, and `permitted_attributes` methods are
+provided by Pundit.)
 
 
 ## Scaffold generator
 
-*garden_variety* includes a scaffold generator similar to the Rails
-scaffold generator:
+*garden_variety* includes a `garden:scaffold` generator similar to the
+Rails `scaffold` generator:
 
 ```
 $ rails generate garden:scaffold post title:string body:text published:boolean
@@ -201,10 +202,10 @@ generator in a few small ways:
 
 Additionally, if you are using the [talent_scout] gem, the scaffold
 generator will invoke `rails generate talent_scout:search` for the
-specified model.  This behavior can be disabled with the `--skip-talent-scout`
-option.  For more information about integrating with *talent_scout*, see
-the [Searching with talent_scout](#searching-with-talent_scout) section
-below.
+specified model.  This behavior can be disabled with the
+`--skip-talent-scout` option.  For more information about integrating
+with *talent_scout*, see the [Searching with talent_scout](
+#searching-with-talent_scout) section below.
 
 [talent_scout]: https://rubygems.org/gems/talent_scout
 
@@ -212,10 +213,10 @@ below.
 ## Flash messages
 
 Flash messages are defined using I18n.  The *garden_variety* installer
-(`rails generate garden:install`) will create a "config/locales/flash.en.yml"
-file containing default "success" and "error" messages.  You can edit
-this file to customize those messages, or add your own translation files
-to support other languages.
+(`rails generate garden:install`) will create a
+"config/locales/flash.en.yml" file containing default "success" and
+"error" messages.  You can edit this file to customize those messages,
+or add your own translation files to support other languages.
 
 As seen in the `PostsController#flash_message` method in the example
 above, a prioritized list of keys are tried when retrieving a flash
@@ -231,8 +232,8 @@ Interpolation in flash messages is also supported (as described by
 by the `flash_options` method.  By default, `flash_options` provides a
 `model_name` value, but you can override it to provide your own values.
 
-[Safe HTML Translations]: http://guides.rubyonrails.org/i18n.html#using-safe-html-translations
-[Passing Variables to Translations]: http://guides.rubyonrails.org/i18n.html#passing-variables-to-translations
+[Safe HTML Translations]: https://guides.rubyonrails.org/i18n.html#using-safe-html-translations
+[Passing Variables to Translations]: https://guides.rubyonrails.org/i18n.html#passing-variables-to-translations
 
 
 ## Beyond garden variety behavior
@@ -295,7 +296,7 @@ end
 
 If you are using the [talent_scout] gem, the default implementation of
 `find_collection` will automatically instantiate your model search class
--- no override required.  For example, if a `PostSearch` class is
+-- no custom code required.  For example, if a `PostSearch` class is
 defined, `PostsController#find_collection` will be equivalent to:
 
 ```ruby
@@ -305,9 +306,11 @@ def find_collection
 end
 ```
 
-Notice, as a side effect, the `@search` variable is set for later use in
-the view.  The model search class will be chosen based on the
-controller's `::model_class`.  For example:
+Notice, as a side effect, the `@search` instance variable is set for
+later use in the view.
+
+The model search class will be chosen based on the controller's
+`::model_class`.  For example:
 
 ```ruby
 class MyPostsController < ApplicationController
@@ -516,7 +519,7 @@ Add this line to your application's Gemfile:
 gem "garden_variety"
 ```
 
-Then execute:
+Then run:
 
 ```bash
 $ bundle install
