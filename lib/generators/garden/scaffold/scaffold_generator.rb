@@ -16,7 +16,7 @@ module Garden
       class_option :template_engine
 
       class_option :talent_scout, type: :boolean, default: true,
-        description: "Invoke talent_scout:search generator"
+        desc: "Invoke talent_scout:search generator"
 
       # override +initialize+ because it is the only way to reliably
       # capture the raw input arguments in order to pass them on to
