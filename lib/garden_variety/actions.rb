@@ -1,6 +1,6 @@
 module GardenVariety
 
-  REDIRECT_CODES = [301, 302, 303, 307, 308]
+  REDIRECT_CODES = [301, 302, 303, 307, 308].to_set
 
   module IndexAction
     # Garden variety controller +index+ action.
