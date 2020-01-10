@@ -10,16 +10,15 @@ module GardenVariety
       # typical REST actions (index, show, new, create, edit, update,
       # destroy) are included.
       #
-      # See also:
-      # - {GardenVariety::IndexAction}
-      # - {GardenVariety::ShowAction}
-      # - {GardenVariety::NewAction}
-      # - {GardenVariety::CreateAction}
-      # - {GardenVariety::EditAction}
-      # - {GardenVariety::UpdateAction}
-      # - {GardenVariety::DestroyAction}
+      # @see GardenVariety::IndexAction
+      # @see GardenVariety::ShowAction
+      # @see GardenVariety::NewAction
+      # @see GardenVariety::CreateAction
+      # @see GardenVariety::EditAction
+      # @see GardenVariety::UpdateAction
+      # @see GardenVariety::DestroyAction
       #
-      # @example default usage
+      # @example Default actions
       #   # This...
       #   class PostsController < ApplicationController
       #     garden_variety
@@ -36,7 +35,7 @@ module GardenVariety
       #     include GardenVariety::DestroyAction
       #   end
       #
-      # @example specific usage
+      # @example Specific actions
       #   # This...
       #   class PostsController < ApplicationController
       #     garden_variety :index, :show
@@ -104,7 +103,7 @@ module GardenVariety
 
     # @!visibility public
     # Returns the value of the singular-form instance variable dictated
-    # by {::model_class}.
+    # by {ClassMethods#model_class ::model_class}.
     #
     # @example
     #   class PostsController
@@ -123,7 +122,7 @@ module GardenVariety
 
     # @!visibility public
     # Sets the value of the singular-form instance variable dictated
-    # by {::model_class}.
+    # by {ClassMethods#model_class ::model_class}.
     #
     # @example
     #   class PostsController
@@ -143,7 +142,7 @@ module GardenVariety
 
     # @!visibility public
     # Returns the value of the plural-form instance variable dictated
-    # by {::model_class}.
+    # by {ClassMethods#model_class ::model_class}.
     #
     # @example
     #   class PostsController
@@ -162,7 +161,7 @@ module GardenVariety
 
     # @!visibility public
     # Sets the value of the plural-form instance variable dictated
-    # by {::model_class}.
+    # by {ClassMethods#model_class ::model_class}.
     #
     # @example
     #   class PostsController
@@ -181,9 +180,9 @@ module GardenVariety
     end
 
     # @!visibility public
-    # Returns an ActiveRecord::Relation representing model instances
-    # corresponding to the controller.  Designed for use in generic
-    # +index+ action methods.
+    # Returns an ActiveRecord::Relation representing instances of
+    # {ClassMethods#model_class ::model_class}.  Designed for use in
+    # generic +index+ action methods.
     #
     # @example
     #   class PostsController < ApplicationController
@@ -198,10 +197,10 @@ module GardenVariety
     end
 
     # @!visibility public
-    # Returns a model instance corresponding to the controller and the
-    # id parameter of the current request (i.e. +params[:id]+).
-    # Designed for use in generic +show+, +edit+, +update+, and
-    # +destroy+ action methods.
+    # Returns an instance of {ClassMethods#model_class ::model_class}
+    # matching the +:id+ parameter of the current request (i.e.
+    # +params[:id]+).  Designed for use in generic +show+, +edit+,
+    # +update+, and +destroy+ action methods.
     #
     # @example
     #   class PostsController < ApplicationController
@@ -211,12 +210,14 @@ module GardenVariety
     #   end
     #
     # @return [ActiveRecord::Base]
+    # @raise [ActiveRecord::RecordNotFound]
+    #   if a model instance with matching +:id+ cannot be found
     def find_model
       self.class.model_class.find(params[:id])
     end
 
     # @!visibility public
-    # Returns a new model instance corresponding to the controller.
+    # Returns a new instance of {ClassMethods#model_class ::model_class}.
     # Designed for use in generic +new+ and +create+ action methods.
     #
     # @example
@@ -232,9 +233,9 @@ module GardenVariety
     end
 
     # @!visibility public
-    # Populates the given model's attributes with the current request
-    # params permitted by the model's Pundit policy.  Returns the given
-    # model modified but not persisted.
+    # Populates the given +model+'s attributes with the current request
+    # params permitted by the corresponding Pundit policy.  Returns the
+    # given +model+ modified but not persisted.
     #
     # @example
     #   class PostsController < ApplicationController
@@ -256,23 +257,23 @@ module GardenVariety
     end
 
     # @!visibility public
-    # Returns Hash of values for interpolation in flash messages via
-    # I18n.  By default, returns a +model_name+ key / value pair based
-    # on the controller's {Controller::ClassMethods#model_name}.
+    # Returns a Hash of values for interpolation in flash messages via
+    # I18n.  By default, returns a +:model_name+ key / value pair with
+    # the humanized name of {ClassMethods#model_class ::model_class}.
     # Override this method to provide your own values.  Be aware that
-    # certain option names, such as +default+ and +scope+, are reserved
-    # by the I18n gem, and can not be used for interpolation.  See the
-    # {https://www.rubydoc.info/gems/i18n I18n documentation} for more
-    # information.
+    # certain option names, such as +:default+ and +:scope+, are
+    # reserved by the I18n gem, and can not be used for interpolation.
+    # See the {https://www.rubydoc.info/gems/i18n I18n documentation}
+    # for more information.
     #
-    # @return [Hash]
+    # @return [Hash{Symbol => #to_s}]
     def flash_options
       { model_name: self.class.model_name.human }
     end
 
     # @!visibility public
     # Returns a flash message appropriate to the controller, the current
-    # action, and a given status.  The flash message is looked up via
+    # action, and a given +status+.  The flash message is looked up via
     # I18n using a prioritized list of possible keys.  The key priority
     # is as follows:
     #

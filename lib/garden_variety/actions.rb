@@ -94,8 +94,8 @@ module GardenVariety
   end
 
   # Map of controller action name to action module.  Used by the
-  # {GardenVariety::Controller::ClassMethods#garden_variety} macro to
-  # include desired controller actions.
+  # {GardenVariety::Controller::ClassMethods#garden_variety
+  # garden_variety} macro to include desired controller actions.
   ACTION_MODULES = {
     index: IndexAction,
     show: ShowAction,
