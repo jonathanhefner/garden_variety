@@ -3,7 +3,7 @@ require "timeout"
 require "test_helper"
 
 class GeneratorTestCase < Rails::Generators::TestCase
-  destination "#{__dir__}/tmp"
+  destination File.expand_path("../tmp", __dir__)
 
   def setup
     prepare_destination
