@@ -536,7 +536,7 @@ This will also run the Pundit install generator, if necessary.
 
 ## Contributing
 
-Run `rake test` to run the tests.
+Run `bin/test` to run the tests.
 
 
 ## License
