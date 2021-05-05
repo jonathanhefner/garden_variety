@@ -1,4 +1,4 @@
-# garden_variety [![Build Status](https://travis-ci.org/jonathanhefner/garden_variety.svg?branch=master)](https://travis-ci.org/jonathanhefner/garden_variety)
+# garden_variety
 
 Delightfully boring Rails controllers.  One of the superb advantages of
 Ruby on Rails is convention over configuration.  Opinionated default
