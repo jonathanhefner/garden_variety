@@ -330,7 +330,7 @@ module GardenVariety
         :"flash.#{status}",
         :"flash.#{status}_html",
       ]
-      helpers.translate(keys.shift, { default: keys }.merge!(flash_options))
+      helpers.translate(keys.shift, default: keys, **flash_options)
     end
   end
 end
