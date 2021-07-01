@@ -513,19 +513,13 @@ from RailsConf which delves deeper into the principle:
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem "garden_variety"
-```
-
-Then run:
+Add the gem to your Gemfile:
 
 ```bash
-$ bundle install
+$ bundle add garden_variety
 ```
 
-And finally, run the install generator:
+And run the install generator:
 
 ```bash
 $ rails generate garden:install
