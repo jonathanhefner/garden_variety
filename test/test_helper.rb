@@ -1,5 +1,3 @@
-Warning[:deprecated] = true if Warning.respond_to?(:[]=)
-
 Bundler.load.setup(:default, :development) # exclude :talent_scout group
 
 # Configure Rails Environment
