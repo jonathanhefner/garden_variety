@@ -1,6 +1,0 @@
-eval_gemfile "../Gemfile"
-
-# HACK veto `talent_scout` dependency because it requires Rails >= 5.2
-dependencies.reject!{|dep| dep.name == "talent_scout" }
-
-gem "rails", "~> 5.1.0"
