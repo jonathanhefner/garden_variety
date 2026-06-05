@@ -3,8 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'minitest', '< 6'
-  gem 'sqlite3', '~> 1.4'
+  gem 'sqlite3', '>= 2.1'
 end
 
 # Use dedicated gem group to load and test in isolation
