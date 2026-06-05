@@ -67,7 +67,7 @@ end
 class IntegrationTest < ActionDispatch::IntegrationTest
 
   setup do
-    Rails.application.config.action_dispatch.show_exceptions = false
+    Rails.application.config.action_dispatch.show_exceptions = :none
 
     PostPolicy.allow_all = true
     PostPolicy.permitted_attributes = [:title]
