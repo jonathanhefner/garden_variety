@@ -2,7 +2,7 @@ module GardenVariety
   module Controller
     extend ActiveSupport::Concern
 
-    include Pundit
+    include Pundit::Authorization
 
     module ClassMethods
       # Macro to include garden variety implementations of specified
