@@ -76,7 +76,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     @post_id = Post.pluck(:id).first
   end
 
-  def test_index
+  test "index finds and renders the collection" do
     get posts_path
     assert_response :success
     assert_used :find_collection
@@ -85,57 +85,57 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def test_index_scoped
+  test "index limits the rendered collection to the authorization scope" do
     PostPolicy::Scope.allow_ids = Post.pluck(:id) - [@post_id]
     get posts_path
     assert_response :success
     assert_select "a[href=?]", post_path(@post_id), count: 0
   end
 
-  def test_index_forbidden
+  test "index raises when authorization denies access" do
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
       get posts_path
     end
   end
 
-  def test_show
+  test "show finds and renders the model" do
     get post_path(@post_id)
     assert_response :success
     assert_used :find_model
     assert_rendered_show @post_id
   end
 
-  def test_show_forbidden
+  test "show raises when authorization denies access" do
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
       get post_path(@post_id)
     end
   end
 
-  def test_new
+  test "new renders a form for a new model" do
     get new_post_path
     assert_response :success
     assert_used :new_model
     assert_rendered_new
   end
 
-  def test_new_with_params
+  test "new assigns params to permitted attributes" do
     get new_post_path, params: { post: { title: "POPULATED!" } }
     assert_response :success
     assert_rendered_new
     assert_select 'input[name="post[title]"][value=?]', "POPULATED!"
-    refute Post.where(title: "POPULATED!").exists?
+    assert_not Post.where(title: "POPULATED!").exists?
   end
 
-  def test_new_forbidden
+  test "new raises when authorization denies access" do
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
       get new_post_path
     end
   end
 
-  def test_create
+  test "create saves and redirects to the model" do
     post posts_path, params: { post: { title: "NEW!" } }
     assert_used :new_model
     new_post = Post.order(:created_at).last
@@ -144,7 +144,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "NEW!", new_post.title
   end
 
-  def test_create_with_custom_redirect
+  test "create supports custom success redirects" do
     expected_path = "/?test"
     post posts_path, params: { post: { title: "NEW!" } },
       headers: { "X-Test-redirect_to" => expected_path }
@@ -153,7 +153,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "NEW!", Post.order(:created_at).last.title
   end
 
-  def test_create_with_sjr
+  test "create renders the default JavaScript (SJR) template on success" do
     post "#{posts_path}.js", params: { post: { title: "SJR!" } },
       headers: { "X-Test-render_default" => true }
     assert_response :success
@@ -162,37 +162,37 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "SJR!", Post.order(:created_at).last.title
   end
 
-  def test_create_validation_fails
+  test "create validation failures render new" do
     post posts_path, params: { post: { title: "BAD!" } }
     assert_response :success
     assert_flash_message :error, now: true
     assert_rendered_new
-    refute Post.where(title: "BAD!").exists?
+    assert_not Post.where(title: "BAD!").exists?
   end
 
-  def test_create_forbidden
+  test "create raises when authorization denies access" do
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
       post posts_path, params: { post: { title: "NEW!" } }
     end
-    refute Post.where(title: "NEW!").exists?
+    assert_not Post.where(title: "NEW!").exists?
   end
 
-  def test_edit
+  test "edit finds the model and renders a form for it" do
     get edit_post_path(@post_id)
     assert_response :success
     assert_used :find_model
     assert_rendered_edit(@post_id)
   end
 
-  def test_edit_forbidden
+  test "edit raises when authorization denies access" do
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
       get edit_post_path(@post_id)
     end
   end
 
-  def test_update
+  test "update saves and redirects to the model" do
     put post_path(@post_id), params: { post: { title: "UPDATED!" } }
     assert_used :find_model
     assert_redirected_to post_path(@post_id)
@@ -200,7 +200,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "UPDATED!", Post.find(@post_id).title
   end
 
-  def test_update_with_custom_redirect
+  test "update supports custom success redirects" do
     expected_path = "/?test"
     put post_path(@post_id), params: { post: { title: "UPDATED!" } },
       headers: { "X-Test-redirect_to" => expected_path }
@@ -209,7 +209,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "UPDATED!", Post.find(@post_id).title
   end
 
-  def test_update_with_sjr
+  test "update renders the default JavaScript (SJR) template on success" do
     put "#{post_path(@post_id)}.js", params: { post: { title: "SJR!" } },
       headers: { "X-Test-render_default" => true }
     assert_response :success
@@ -218,47 +218,47 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert_equal "SJR!", Post.find(@post_id).title
   end
 
-  def test_update_validation_fails
+  test "update validation failures render edit" do
     put post_path(@post_id), params: { post: { title: "BAD!" } }
     assert_response :success
     assert_rendered_edit(@post_id)
     assert_flash_message :error, now: true
-    refute_equal "BAD!", Post.find(@post_id).title
+    assert_not_equal "BAD!", Post.find(@post_id).title
   end
 
-  def test_update_forbidden
+  test "update raises when authorization denies access" do
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
       put post_path(@post_id), params: { post: { title: "UPDATED!" } }
     end
-    refute_equal "UPDATED!", Post.find(@post_id).title
+    assert_not_equal "UPDATED!", Post.find(@post_id).title
   end
 
-  def test_destroy
+  test "destroy deletes and redirects to index" do
     delete post_path(@post_id)
     assert_used :find_model
     assert_redirected_to posts_path
     assert_flash_message :success
-    refute Post.exists?(@post_id)
+    assert_not Post.exists?(@post_id)
   end
 
-  def test_destroy_with_custom_redirect
+  test "destroy supports custom success redirects" do
     expected_path = "/?test"
     delete post_path(@post_id), headers: { "X-Test-redirect_to" => expected_path }
     assert_redirected_to expected_path
     assert_flash_message :success
-    refute Post.exists?(@post_id)
+    assert_not Post.exists?(@post_id)
   end
 
-  def test_destroy_with_sjr
+  test "destroy renders the default JavaScript (SJR) template on success" do
     delete "#{post_path(@post_id)}.js", headers: { "X-Test-render_default" => true }
     assert_response :success
     assert_flash_message :success, now: true
     assert_rendered_sjr :destroy
-    refute Post.exists?(@post_id)
+    assert_not Post.exists?(@post_id)
   end
 
-  def test_destroy_fails
+  test "destroy failures render show" do
     Post.find(@post_id).update(title: "PERMANENT!")
     delete post_path(@post_id)
     assert_response :success
@@ -267,7 +267,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert Post.exists?(@post_id)
   end
 
-  def test_destroy_forbidden
+  test "destroy raises when authorization denies access" do
     PostPolicy.allow_all = false
     assert_raises(Pundit::NotAuthorizedError) do
       delete post_path(@post_id)
@@ -275,12 +275,12 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     assert Post.exists?(@post_id)
   end
 
-  def test_strong_params
+  test "update assigns only policy-permitted params" do
     PostPolicy.permitted_attributes = []
     put post_path(@post_id), params: { post: { title: "UNPERMITTED!" } }
     follow_redirect!
     assert_response :success
-    refute_equal "UNPERMITTED!", Post.find(@post_id).title
+    assert_not_equal "UNPERMITTED!", Post.find(@post_id).title
   end
 
   private
@@ -295,7 +295,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     # distinguish them by checking values to keep for next request
     keep = flash.to_session_value.to_h["flashes"].to_h
     if now
-      refute_includes keep, key.to_s
+      assert_not_includes keep, key.to_s
     else
       assert_includes keep, key.to_s
     end

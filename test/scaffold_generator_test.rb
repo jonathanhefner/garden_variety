@@ -10,17 +10,17 @@ class ScaffoldGeneratorTest < GeneratorTestCase
     prepare_routes
   end
 
-  def test_generates_scaffold
+  test "generates scaffold files" do
     generate_scaffold("fruit")
     assert_scaffold("fruit")
   end
 
-  def test_generates_namespaced_scaffold
+  test "generates namespaced scaffold files" do
     generate_scaffold("spaced/vegetable")
     assert_scaffold("spaced/vegetable")
   end
 
-  def test_generates_locales_if_missing
+  test "generates flash locales if missing" do
     locales_file = "config/locales/flash.en.yml"
     assert_no_file locales_file # sanity check
 

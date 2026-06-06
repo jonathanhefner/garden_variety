@@ -5,12 +5,12 @@ require "generators/garden/install/install_generator"
 class InstallGeneratorTest < GeneratorTestCase
   tests Garden::Generators::InstallGenerator
 
-  def test_generates_locales
+  test "generates flash locales" do
     run_generator
     assert_file "config/locales/flash.en.yml"
   end
 
-  def test_generates_pundit_application_policy_if_missing
+  test "generates Pundit ApplicationPolicy if missing" do
     policy_file = "app/policies/application_policy.rb"
     assert_no_file policy_file # sanity check
 

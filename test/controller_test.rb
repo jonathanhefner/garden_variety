@@ -38,7 +38,7 @@ class CustomUsagesController < ActionController::Base
 end
 
 
-class ControllerTest < Minitest::Test
+class ControllerTest < ActiveSupport::TestCase
 
   ALL_ACTION_MODULES = [
     GardenVariety::IndexAction, GardenVariety::ShowAction,
@@ -60,28 +60,28 @@ class ControllerTest < Minitest::Test
     Namespaced::NoUsagesController,
   ).keys.freeze
 
-  def test_assumptions
+  test "assumptions about Active Model naming" do
     assert_equal "namespaced_default_usage", Namespaced::DefaultUsage.model_name.singular
     assert_equal "Default usage", Namespaced::DefaultUsage.model_name.human
   end
 
-  def test_garden_variety_macro_raises_on_invalid_action
+  test "::garden_variety raises on invalid actions" do
     assert_raises(ArgumentError){ NoUsagesController.garden_variety :bad }
   end
 
-  def test_model_class
+  test "::model_class derives from controller path unless overridden" do
     CONTROLLER_MODELS.each do |controller_class, model_class|
       assert_equal model_class, controller_class.model_class
     end
   end
 
-  def test_model_name
+  test "::model_name is derived from ::model_class" do
     CONTROLLER_MODELS.each do |controller_class, model_class|
       assert_equal ActiveModel::Name.new(model_class), controller_class.model_name
     end
   end
 
-  def test_model_name_syncs_with_model_class
+  test "::model_name syncs with ::model_class=" do
     assert_equal DefaultUsage.model_name, DefaultUsagesController.model_name
     DefaultUsagesController.model_class = CustomYuuseju
     assert_equal CustomUsagesController.model_name, DefaultUsagesController.model_name
@@ -89,7 +89,7 @@ class ControllerTest < Minitest::Test
     DefaultUsagesController.model_class = DefaultUsage # restore
   end
 
-  def test_collection_getter
+  test "#collection reads the plural-model instance variable" do
     GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
       collection_attr = controller_class.model_name.plural
@@ -98,7 +98,7 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_collection_setter
+  test "#collection= writes the plural-model instance variable" do
     GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
       collection_attr = controller_class.model_name.plural
@@ -107,7 +107,7 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_model_getter
+  test "#model reads the singular-model instance variable" do
     GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
       model_attr = controller_class.model_name.singular
@@ -116,7 +116,7 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_model_setter
+  test "#model= writes the singular-model instance variable" do
     GARDEN_VARIETY_CONTROLLERS.each do |controller_class|
       controller = controller_class.new
       model_attr = controller_class.model_name.singular
@@ -125,20 +125,20 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_include_default_actions
+  test "::garden_variety includes all REST action modules by default" do
     assert_empty (ALL_ACTION_MODULES - DefaultUsagesController.included_modules)
   end
 
-  def test_include_no_actions
+  test "controllers do not include action modules by default" do
     assert_equal ALL_ACTION_MODULES, (ALL_ACTION_MODULES - NoUsagesController.included_modules)
   end
 
-  def test_include_custom_actions
+  test "::garden_variety includes only requested action modules when specified" do
     action_modules = [GardenVariety::IndexAction, GardenVariety::ShowAction]
     assert_empty (action_modules - CustomUsagesController.included_modules)
   end
 
-  def test_flash_options
+  test "#flash_options defaults model_name to the human model name" do
     CONTROLLER_MODELS.keys.each do |controller_class|
       model_name = controller_class.model_name.human
       actual = controller_class.new.send(:flash_options)
@@ -146,7 +146,7 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_flash_message_key_priority
+  test "#flash_message prioritizes controller/action/status I18n keys" do
     controller = DefaultUsagesController.new
     controller.action_name = "test"
     status = "priority"
@@ -167,7 +167,7 @@ class ControllerTest < Minitest::Test
     end
   end
 
-  def test_flash_message_with_custom_model
+  test "#flash_message is scoped to controller_name, not model_name" do
     controller = CustomUsagesController.new
     controller.action_name = "test"
     status = "custom"
@@ -178,7 +178,7 @@ class ControllerTest < Minitest::Test
     assert_equal "expected", controller.send(:flash_message, status)
   end
 
-  def test_flash_message_with_namespace
+  test "#flash_message includes controller namespace in controller-specific I18n keys" do
     controller = Namespaced::DefaultUsagesController.new
     controller.action_name = "test"
     status = "namespaced"
@@ -188,13 +188,13 @@ class ControllerTest < Minitest::Test
     assert_equal "expected", controller.send(:flash_message, status)
   end
 
-  def test_flash_message_html_escaping
+  test "#flash_message preserves HTML safety for *_html I18n keys" do
     controller = DefaultUsagesController.new
     controller.action_name = "test"
     text = "<p>hello</p>"
 
     store_translation("literal_text", text)
-    refute controller.send(:flash_message, "literal_text").html_safe?
+    assert_not controller.send(:flash_message, "literal_text").html_safe?
 
     store_translation("raw_html", text)
     assert controller.send(:flash_message, "raw_html").html_safe?

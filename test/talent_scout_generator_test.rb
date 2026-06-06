@@ -16,13 +16,13 @@ class TalentScoutGeneratorTest < GeneratorTestCase
     prepare_routes
   end
 
-  def test_generates_talent_scout_search
+  test "generates a talent_scout model search class" do
     run_generator(["spaced/fruit"])
     assert_file "app/models/spaced/fruit.rb" # sanity check
     assert_file "app/searches/spaced/fruit_search.rb"
   end
 
-  def test_respects_skip_talent_scout
+  test "respects --skip-talent-scout" do
     run_generator(["vegetable", "--skip-talent-scout"])
     assert_file "app/models/vegetable.rb" # sanity check
     assert_no_directory "app/searches"

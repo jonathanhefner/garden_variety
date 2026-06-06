@@ -1,13 +1,13 @@
 return if Bundler.load.dependencies.none?{|dep| dep.name == "talent_scout" }
 require "test_helper"
 
-class TalentScoutTest < Minitest::Test
+class TalentScoutTest < ActiveSupport::TestCase
   include ActiveSupport::Testing::Isolation
 
   def setup
     # sanity check
-    refute defined?(::TalentScout)
-    refute defined?(::GardenVariety::TalentScout)
+    assert_not defined?(::TalentScout)
+    assert_not defined?(::GardenVariety::TalentScout)
     # enable talent_scout gem group
     Bundler.load.setup(:default, :talent_scout)
     # reload garden_variety, which will now load talent_scout plus integration
@@ -29,29 +29,29 @@ class TalentScoutTest < Minitest::Test
     self.class.const_set("MyModelSearch", Class.new(TalentScout::ModelSearch))
   end
 
-  def test_model_search_class
+  test "::model_search_class derives from ::model_class" do
     assert_equal MyModelSearch, MyModelsController.model_search_class
     assert_equal MyModelSearch, MyModelsController.model_search_class?
   end
 
-  def test_model_search_class_when_model_class_overridden
+  test "::model_search_class follows overridden ::model_class" do
     assert_equal MyModelSearch, MyOtherModelsController.model_search_class
     assert_equal MyModelSearch, MyOtherModelsController.model_search_class?
   end
 
-  def test_model_search_class_when_no_search_class
+  test "::model_search_class raises when the model search class does not exist" do
     assert_raises(NameError){ UnsearchablesController.model_search_class }
-    refute UnsearchablesController.model_search_class?
+    assert_not UnsearchablesController.model_search_class?
   end
 
-  def test_find_collection
+  test "#find_collection uses search results when a search class exists" do
     controller = MyModelsController.new
     controller.params = ActionController::Parameters.new
     assert_equal MyModel.all, controller.send(:find_collection)
     assert_instance_of MyModelSearch, controller.instance_eval{ @search }
   end
 
-  def test_find_collection_when_no_search_class
+  test "#find_collection falls back to the model finder method when the model search class does not exist" do
     controller = UnsearchablesController.new
     assert_equal Unsearchable.all, controller.send(:find_collection)
     assert_nil controller.instance_eval{ defined?(@search) }
