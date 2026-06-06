@@ -154,6 +154,8 @@ Rails `scaffold` generator:
 
 ```
 $ rails generate garden:scaffold post title:string body:text published:boolean
+       exist  config/locales
+      create  config/locales/flash.en.yml
     generate  resource
       invoke  active_record
       create    db/migrate/19991231235959_create_posts.rb
@@ -170,11 +172,6 @@ $ rails generate garden:scaffold post title:string body:text published:boolean
       invoke    helper
       create      app/helpers/posts_helper.rb
       invoke      test_unit
-      invoke    assets
-      invoke      coffee
-      create        app/assets/javascripts/posts.coffee
-      invoke      scss
-      create        app/assets/stylesheets/posts.scss
       invoke  resource_route
        route    resources :posts
     generate  erb:scaffold
@@ -184,6 +181,7 @@ $ rails generate garden:scaffold post title:string body:text published:boolean
       create  app/views/posts/show.html.erb
       create  app/views/posts/new.html.erb
       create  app/views/posts/_form.html.erb
+      create  app/views/posts/_post.html.erb
       insert  app/controllers/posts_controller.rb
     generate  pundit:policy
       create  app/policies/post_policy.rb
