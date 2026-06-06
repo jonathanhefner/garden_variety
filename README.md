@@ -262,7 +262,7 @@ end
 
 ### Pagination
 
-You can integrate your your favorite pagination gem (*may I suggest
+You can integrate your favorite pagination gem (*may I suggest
 [moar](https://rubygems.org/gems/moar)?*) by overriding the
 `find_collection` method:
 
