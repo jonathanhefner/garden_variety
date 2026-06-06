@@ -1,3 +1,8 @@
+## 4.0.0
+
+* [BREAKING] Require Ruby >= 3.4 and Rails >= 8.1.
+
+
 ## 3.0.0
 
 * [BREAKING] Require Pundit 2.0
