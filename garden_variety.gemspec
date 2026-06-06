@@ -9,7 +9,6 @@ Gem::Specification.new do |spec|
   spec.summary     = %q{Delightfully boring Rails controllers}
   spec.license     = "MIT"
 
-  spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
   spec.metadata["changelog_uri"] = spec.metadata["source_code_uri"] + "/blob/master/CHANGELOG.md"
 
